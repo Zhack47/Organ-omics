@@ -47,7 +47,6 @@ def extract_organomics(root_dataset_path, output_directory):
         label_path = join(root_dataset_path, "labelsTr", f"{name}.nii.gz")
         for class_name, class_label in classes.items():
             label = load_mask(label_path,label=int(class_label))
-            label = resample_mask(label, (6,6,6))
             masks[class_name] = label
 
         for modality_value, _ in channels.items():
