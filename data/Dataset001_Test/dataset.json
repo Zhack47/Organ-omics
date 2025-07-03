@@ -5,6 +5,7 @@
         "0": "CT",
         "1": "PT"
     },
+    "task": "total",
     "labels":
     {
         "background": "0",

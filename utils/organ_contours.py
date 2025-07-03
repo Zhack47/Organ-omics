@@ -21,13 +21,15 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
         output_fpath (str): Path to the file where the output is saved
         total_seg_kwargs (dict): TotalSegmentator additional arguments
     """
-    roi_subset, labels, labels_map = config_total_seg(dastaset_json_path)
-    nii_seg = totalsegmentator(nib.load(ct_path), roi_subset=roi_subset,
+    roi_subset, labels, labels_map, task = config_total_seg(dastaset_json_path)
+    if task not in ["total", "total_mr"]:
+        roi_subset = None
+    nii_seg = totalsegmentator(nib.load(ct_path), task=task, roi_subset=roi_subset,
                                skip_saving=True, **total_seg_kwargs)
     affine = nii_seg.affine
     data = np.array(nii_seg.dataobj)
     grouped_data = np.zeros_like(data)
-    reverse_map = {v: k for k, v in class_map["total"].items()}
+    reverse_map = {v: k for k, v in class_map[task].items()}
     for group_label in list(labels.keys())[1:]:
         for roi in labels_map[group_label]:
             label = reverse_map[roi]
