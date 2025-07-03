@@ -1,23 +1,35 @@
 import os
 from os.path import join
+from tqdm import tqdm
+import SimpleITK as sitk
+
 from utils.parse import load_names
-from utils.volumes.masks import load_mask, resample_mask
 from utils.volumes.images import load_image
 from utils.radiomics.extraction import Radiomics_Extractor
-from tqdm import tqdm
+from utils.volumes.masks import load_mask, resample_mask, bb_sitk
 
+
+def crop_image_mask(image: sitk.Image, mask: sitk.Image, margin=(0, 0, 0)):
+    X, Y, Z = mask.GetSize()
+    start_index_x, start_index_y, start_index_z, size_x, size_y, size_z =bb_sitk(mask)
+    start =  [max(0, start_index_x - margin[2]), max(0, start_index_y - margin[1]), max(0, start_index_z - margin[0])]
+    size =  [min(X-start_index_x, size_x + margin[2]), min(Y - start_index_y, size_y     + margin[1]),
+             min(Z-start_index_z, size_z + margin[0])]
+    cropped_image = sitk.RegionOfInterest(image, size, start)
+    cropped_mask = sitk.RegionOfInterest(mask, size, start)
+    return cropped_image, cropped_mask
 
 def extract_organomics(root_dataset_path, output_directory):
     """Extracts organ radiomics for a whole nnUNet dataset
 
     Args:
         root_dataset_path (str): path to the root of the nnUNet dataset
-        output_directory (str): Output directory where the csv file will be saved TODO define naming convention
+        output_directory (str): Output directory where the Organomics.csv file will be saved
     """
     _, _, names, channels, _, _, classes = load_names(root_dataset_path)
     del classes["background"]  # Remove the background from channels
     os.makedirs(output_directory, exist_ok=True)
-    out_csv_file = open(join(output_directory, "bla.csv"), "w", encoding="utf-8")
+    out_csv_file = open(join(output_directory, "Organomics.csv"), "w", encoding="utf-8")
 
 
     # Write columns headers
@@ -33,7 +45,8 @@ def extract_organomics(root_dataset_path, output_directory):
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{str(modality_value).zfill(4)}.nii.gz")
             image = load_image(image_path)
             for class_name, mask in masks.items():
-                print(class_name)                    
+                mask = resample_mask(mask, image)
+                image, mask = crop_image_mask(image, mask, margin=(2,2,2))
                 re = Radiomics_Extractor(image, mask)
                 feature_vector = re.get_feature_vector()
                 for key, _ in feature_vector.items():
@@ -54,6 +67,8 @@ def extract_organomics(root_dataset_path, output_directory):
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{suffix}.nii.gz")
             image = load_image(image_path)
             for class_name, mask in masks.items():
+                mask = resample_mask(mask, image)
+                image, mask = crop_image_mask(image, mask, margin=(2,2,2))
                 re = Radiomics_Extractor(image, mask)
                 feature_vector = re.get_feature_vector()
                 for _, value in feature_vector.items():
