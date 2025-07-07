@@ -39,3 +39,4 @@ if __name__ == "__main__":
     model.fit(X_train, Y_train)
     y_hat_test = model.predict(X_test)
     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
+    print(ci)
