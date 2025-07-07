@@ -23,6 +23,7 @@ if __name__ == "__main__":
                                endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
     X_train.fillna(0)
     X_test.fillna(0)
+    del X_train["Patient_ID"]
     model = FastSurvivalSVM()
     model.fit(X_train, Y_train)
     y_hat_test = model.predict(X_test)
