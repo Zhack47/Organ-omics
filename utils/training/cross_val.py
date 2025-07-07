@@ -21,8 +21,8 @@ if __name__ == "__main__":
     
     Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
                                endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
-    X_train.fillna(0)
-    X_test.fillna(0)
+    X_train = X_train.fillna(0)
+    X_test = X_test.fillna(0)
     del X_train["Patient_ID"]
     model = FastSurvivalSVM()
     model.fit(X_train, Y_train)
