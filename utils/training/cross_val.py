@@ -4,6 +4,7 @@ from sksurv.ensemble import RandomSurvivalForest
 from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from sksurv. util import Surv
 from sksurv.metrics import concordance_index_censored
+from icare.survival import BaggedIcareSurvival
 
 
 if __name__ == "__main__":
@@ -42,7 +43,7 @@ if __name__ == "__main__":
             del X_train[col]
             del X_test[col]
 
-    model = FastSurvivalSVM()
+    model = BaggedIcareSurvival()
     model.fit(X_train, Y_train)
     y_hat_test = model.predict(X_test)
     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
