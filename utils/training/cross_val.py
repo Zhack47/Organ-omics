@@ -10,7 +10,7 @@ if __name__ == "__main__":
     endpoints_path = sys.argv[2]
     organomics = pd.read_csv(organomics_path)
     endpoints = pd.read_csv(endpoints_path)
-    patient_ids = organomics["Patient ID"]
+    patient_ids = organomics["Patient_ID"]
     train_ids = patient_ids[:round(len(patient_ids)*.8)]
     test_ids = patient_ids[round(len(patient_ids)*.8):]
     X_train = organomics[organomics["Patient_ID"].isin(train_ids)]
