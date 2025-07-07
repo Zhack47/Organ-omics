@@ -1,5 +1,6 @@
 import pandas as pd
 from sksurv.svm.survival_svm import FastSurvivalSVM
+from sksurv.ensemble import RandomSurvivalForest
 from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from sksurv. util import Surv
 from sksurv.metrics import concordance_index_censored
