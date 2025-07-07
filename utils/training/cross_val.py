@@ -1,6 +1,4 @@
 import pandas as pd
-from sksurv.svm.survival_svm import FastSurvivalSVM
-from sksurv.ensemble import RandomSurvivalForest
 from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from sksurv. util import Surv
 from sksurv.metrics import concordance_index_censored
@@ -34,14 +32,14 @@ if __name__ == "__main__":
     del X_test["Patient_ID"]
 
     # Feature selection
-    for col in X_train.columns:
+    '''for col in X_train.columns:
         model = CoxnetSurvivalAnalysis()
         model.fit(X_train[col].values.reshape(-1, 1), Y_train)
         corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
                                                  model.predict(X_train[col].values.reshape(-1, 1)))
         if corr_score[0] <.5:
             del X_train[col]
-            del X_test[col]
+            del X_test[col]'''
 
     model = BaggedIcareSurvival()
     model.fit(X_train, Y_train)
