@@ -2,6 +2,7 @@ import os
 from os.path import join
 from tqdm import tqdm
 import SimpleITK as sitk
+import numpy as np
 
 from utils.parse import load_names
 from utils.volumes.images import load_image
@@ -34,6 +35,7 @@ def extract_organomics(root_dataset_path, output_directory):
 
     # Write columns headers
     out_csv_file.write("Patient_ID")
+    feature_names = set()
     for name in names[:1]:
         # Extracting all masks once
         masks = {}
@@ -51,6 +53,7 @@ def extract_organomics(root_dataset_path, output_directory):
                 feature_vector = re.get_feature_vector()
                 for key, _ in feature_vector.items():
                     out_csv_file.write(f",{modality_name}_{class_name}_{key}")
+                    feature_names.add(key)
         out_csv_file.write("\n")
 
     for name in tqdm(names):
@@ -68,11 +71,17 @@ def extract_organomics(root_dataset_path, output_directory):
             image = load_image(image_path)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
-                cropped_image, cropped_mask = crop_image_mask(image, mask, margin=(2,2,2))
-                re = Radiomics_Extractor(cropped_image, cropped_mask)
-                feature_vector = re.get_feature_vector()
-                for _, value in feature_vector.items():
-                    out_csv_file.write(f",{value}")
+                mask_array = sitk.GetArrayFromImage(mask)
+                first_value = mask_array.flat[0]
+                if  not np.all(mask_array==first_value) and np.sum(mask_array)>1:  # TODO replace with GetSum or sth from SimpleITK
+                    cropped_image, cropped_mask = crop_image_mask(image, mask, margin=(2,2,2))
+                    re = Radiomics_Extractor(cropped_image, cropped_mask)
+                    feature_vector = re.get_feature_vector()
+                    for _, value in feature_vector.items():
+                        out_csv_file.write(f",{value}")
+                else:
+                    for _ in feature_names:
+                        out_csv_file.write(f",{np.nan}")
         out_csv_file.write("\n")
 
     out_csv_file.close()
