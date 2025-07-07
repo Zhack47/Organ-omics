@@ -46,8 +46,8 @@ def extract_organomics(root_dataset_path, output_directory):
             image = load_image(image_path)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
-                image, mask = crop_image_mask(image, mask, margin=(2,2,2))
-                re = Radiomics_Extractor(image, mask)
+                cropped_image, cropped_mask = crop_image_mask(image, mask, margin=(2,2,2))
+                re = Radiomics_Extractor(cropped_image, cropped_mask)
                 feature_vector = re.get_feature_vector()
                 for key, _ in feature_vector.items():
                     out_csv_file.write(f",{modality_name}_{class_name}_{key}")
@@ -68,8 +68,8 @@ def extract_organomics(root_dataset_path, output_directory):
             image = load_image(image_path)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
-                image, mask = crop_image_mask(image, mask, margin=(2,2,2))
-                re = Radiomics_Extractor(image, mask)
+                cropped_image, cropped_mask = crop_image_mask(image, mask, margin=(2,2,2))
+                re = Radiomics_Extractor(cropped_image, cropped_mask)
                 feature_vector = re.get_feature_vector()
                 for _, value in feature_vector.items():
                     out_csv_file.write(f",{value}")
