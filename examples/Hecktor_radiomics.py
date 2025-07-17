@@ -53,11 +53,11 @@ for i in range(4):
             model.fit(X_train[col].values.reshape(-1, 1), Y_train)
             corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
                                                         model.predict(X_train[col].values.reshape(-1, 1)))
-            if corr_score[0] <.58:
+            if corr_score[0] <.56:
                 del X_train[col]
                 del X_test[col]
 
-        model = BaggedIcareSurvival(n_estimators=1000, n_jobs=-1)
+        model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
         #model = FastSurvivalSVM()
         model.fit(X_train, Y_train)
         y_hat_test = model.predict(X_test)

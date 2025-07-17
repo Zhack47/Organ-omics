@@ -57,7 +57,7 @@ for i in range(4):
                 del X_train[col]
                 del X_test[col]
         print(X_train.shape)
-        model = BaggedIcareSurvival(n_estimators=1000, n_jobs=-1)
+        model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
         #model = FastSurvivalSVM(max_iter=3)
         model.fit(X_train, Y_train)
         y_hat_test = model.predict(X_test)
