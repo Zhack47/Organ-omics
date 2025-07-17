@@ -53,6 +53,7 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
     for c in duplicate_columns:
         if c not in ["RFS", "Relapse", "Patient ID"]:
             del X_train[c]
+            del X_test[c]
     Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
                                 endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
 
