@@ -27,9 +27,9 @@ organomics = organomics[organomics["Patient_ID"].isin(endpoints["PatientID"])]
 ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(3, random_state=np.random.randint(0, 100000000), shuffle=True)
-total_ci = 0.
-total_cdauc = 0.
 for thresh in [.5, .52, .54, .56, .58, .6]:
+    total_ci = 0.
+    total_cdauc = 0.
     for i in range(4):
         avg_ci = 0.
         avg_cdauc = 0.
@@ -73,7 +73,7 @@ for thresh in [.5, .52, .54, .56, .58, .6]:
     #        print(cd_auc[1])
         print(avg_ci/3)
         print(avg_cdauc/3)
-        total_ci+=avg_ci
-        total_cdauc+=avg_cdauc
+        total_ci+=avg_ci/3
+        total_cdauc+=avg_cdauc/3
     print(f"{thresh} : {total_ci/4}")
     print(f"{thresh} : {total_cdauc/4}")
