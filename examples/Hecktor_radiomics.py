@@ -55,7 +55,7 @@ list_models = [FastSurvivalSVM(max_iter=3),
               ]
 with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
-    for t in np.arange(.52, .58, .001):
+    for t in np.arange(.52, .58, .01):
         csvfile.write(f",{t}")
     for model in list_models:
         for tr_ids, ts_ids in kfold.split(ids, censored):
