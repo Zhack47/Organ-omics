@@ -52,11 +52,11 @@ for i in range(10):
             model.fit(X_train[col].values.reshape(-1, 1), Y_train)
             corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
                                                         model.predict(X_train[col].values.reshape(-1, 1)))
-            if corr_score[0] <.5:
+            if corr_score[0] <.56:
                 del X_train[col]
                 del X_test[col]
 
-        model = BaggedIcareSurvival()
+        model = BaggedIcareSurvival(n_jobs=-1)
         model.fit(X_train, Y_train)
         y_hat_test = model.predict(X_test)
         ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
