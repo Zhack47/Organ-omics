@@ -63,16 +63,16 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
     del X_train["Patient_ID"]
     del X_test["Patient_ID"]
 
-    # Feature selection
-    for col in X_train.columns:
-        model = CoxnetSurvivalAnalysis()
-        model.fit(X_train[col].values.reshape(-1, 1), Y_train)
-        corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
-                                                    model.predict(X_train[col].values.reshape(-1, 1)))
-        if corr_score[0] < thresh:
-            del X_train[col]
-            del X_test[col]
     for thresh in tqdm(np.arange(.52, .58, .01)):
+        # Feature selection
+        for col in X_train.columns:
+            model = CoxnetSurvivalAnalysis()
+            model.fit(X_train[col].values.reshape(-1, 1), Y_train)
+            corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
+                                                        model.predict(X_train[col].values.reshape(-1, 1)))
+            if corr_score[0] < thresh:
+                del X_train[col]
+                del X_test[col]
         total_ci = 0.
         total_cdauc = 0.
         for i in range(4):
