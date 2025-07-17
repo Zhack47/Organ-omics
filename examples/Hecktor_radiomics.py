@@ -53,7 +53,7 @@ list_models = [FastSurvivalSVM(max_iter=3),
               #BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
               #BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
               ]
-with open("data/csvs/Radiomics_performance.csv", "w") as csvfile:
+with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
     for t in np.arange(.52, .58, .001):
         csvfile.write(f",{t}")
