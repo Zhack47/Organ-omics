@@ -40,18 +40,18 @@ radiomics = radiomics[radiomics["Patient_ID"].isin(endpoints["PatientID"])]
 ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
-thresh_range = np.arange(.52, .58, .01)
+thresh_range = np.arange(.52, .58, .001)
 res_dict = {i:[] for i in thresh_range}
 patient_ids = radiomics["Patient_ID"]
 
 list_models = [FastSurvivalSVM(max_iter=3),
               FastSurvivalSVM(max_iter=100),
-              #FastSurvivalSVM(max_iter=1000),
+              FastSurvivalSVM(max_iter=1000),
               BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
               ]
 with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
@@ -59,7 +59,7 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
         csvfile.write(f",{t}")
     csvfile.write("\n")
     for model in list_models:
-        print(model.__str__())
+        print(model.__str__().replace(",", " "))
         for tr_ids, ts_ids in kfold.split(ids, censored):
             train_ids = ids[tr_ids]
             test_ids = ids[ts_ids]
