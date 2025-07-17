@@ -28,7 +28,7 @@ censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
 
-for thresh in tqdm([.5, .52, .54, .56, .58]):
+for thresh in tqdm(np.arange(.5, .58, .01)):
     total_ci = 0.
     total_cdauc = 0.
     for i in range(4):
