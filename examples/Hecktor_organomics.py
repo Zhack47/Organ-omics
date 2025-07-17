@@ -42,44 +42,42 @@ censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
 res_dict = {}
-for thresh in [.5, .52, .54, .56, .58, .6]:
-    total_ci = 0.
-    total_cdauc = 0.
-    for i in range(4):
+for tr_ids, ts_ids in kfold.split(ids, censored):
+    train_ids = ids[tr_ids]
+    test_ids = ids[ts_ids]
+    X_train = organomics[organomics["Patient_ID"].isin(train_ids)]
+    X_test = organomics[organomics["Patient_ID"].isin(test_ids)]
+
+    Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
+                                endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
+
+    Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
+                                endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
+    
+    duplicate_columns = get_duplicates(organomics)
+    for c in duplicate_columns:
+        if c not in ["RFS", "Relapse", "Patient ID"]:
+            del organomics[c]
+
+    X_train = X_train.fillna(0)
+    X_test = X_test.fillna(0)
+    del X_train["Patient_ID"]
+    del X_test["Patient_ID"]
+
+    for thresh in [.5, .52, .54, .56, .58]:
+        # Feature selection
+        for col in tqdm(X_train.columns):
+            model = CoxnetSurvivalAnalysis()
+            model.fit(X_train[col].values.reshape(-1, 1), Y_train)
+            corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
+                                                        model.predict(X_train[col].values.reshape(-1, 1)))
+            if corr_score[0] < thresh:
+                del X_train[col]
+                del X_test[col]
+
         avg_ci = 0.
         avg_cdauc = 0.
-        for tr_ids, ts_ids in kfold.split(ids, censored):
-            train_ids = ids[tr_ids]
-            test_ids = ids[ts_ids]
-            X_train = organomics[organomics["Patient_ID"].isin(train_ids)]
-            X_test = organomics[organomics["Patient_ID"].isin(test_ids)]
-
-            Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
-                                        endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
-
-            Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
-                                        endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
-            
-            duplicate_columns = get_duplicates(organomics)
-            for c in duplicate_columns:
-                if c not in ["RFS", "Relapse", "Patient ID"]:
-                    del organomics[c]
-
-            X_train = X_train.fillna(0)
-            X_test = X_test.fillna(0)
-            del X_train["Patient_ID"]
-            del X_test["Patient_ID"]
-
-            # Feature selection
-            for col in tqdm(X_train.columns):
-                model = CoxnetSurvivalAnalysis()
-                model.fit(X_train[col].values.reshape(-1, 1), Y_train)
-                corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
-                                                            model.predict(X_train[col].values.reshape(-1, 1)))
-                if corr_score[0] < thresh:
-                    del X_train[col]
-                    del X_test[col]
-            print(X_train.shape)
+        for i in range(4):
             #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
             model = FastSurvivalSVM(max_iter=3)
             model.fit(X_train, Y_train)
@@ -90,13 +88,10 @@ for thresh in [.5, .52, .54, .56, .58, .6]:
             cd_auc = cumulative_dynamic_auc(Y_train, Y_test, y_hat_test, times=time_points)
             avg_ci += ci[0]
             avg_cdauc += cd_auc[1]
-    #        print(ci)
-    #        print(cd_auc[1])
-        print(avg_ci/5)
-        print(avg_cdauc/5)
-        total_ci+=avg_ci/5
-        total_cdauc+=avg_cdauc/5
-    res_dict[thresh] = (total_ci/4, total_cdauc/4)
-    print(f"{thresh} : {total_ci/4}")
-    print(f"{thresh} : {total_cdauc/4}")
+        res_dict[thresh].append(avg_ci/4)
+
+print(res_dict)
+for k in res_dict.keys():
+    avg = np.mean(res_dict[k])
+    res_dict[k] = avg
 print(res_dict)
