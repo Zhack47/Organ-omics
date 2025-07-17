@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from sksurv. util import Surv
+from sksurv.svm import FastSurvivalSVM
 from sksurv.metrics import concordance_index_censored, cumulative_dynamic_auc
 from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from sklearn.model_selection import StratifiedKFold
@@ -57,6 +58,7 @@ for i in range(4):
                 del X_test[col]
 
         model = BaggedIcareSurvival(n_estimators=1000, n_jobs=-1)
+        model = FastSurvivalSVM()
         model.fit(X_train, Y_train)
         y_hat_test = model.predict(X_test)
         y_hat_train = model.predict(X_train)

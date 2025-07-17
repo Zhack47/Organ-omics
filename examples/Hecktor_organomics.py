@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from sksurv. util import Surv
+from sksurv.svm import FastSurvivalSVM
 from sksurv.metrics import concordance_index_censored, cumulative_dynamic_auc
 from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from icare.survival import BaggedIcareSurvival
@@ -56,7 +57,8 @@ for i in range(4):
                 del X_train[col]
                 del X_test[col]
 
-        model = BaggedIcareSurvival(n_jobs=-1)
+        #model = BaggedIcareSurvival(n_jobs=-1)
+        model = FastSurvivalSVM()
         model.fit(X_train, Y_train)
         y_hat_test = model.predict(X_test)
         ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
