@@ -1,7 +1,7 @@
 
 import sys
+import copy
 import warnings
-
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -12,6 +12,19 @@ from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from icare.survival import BaggedIcareSurvival
 from sklearn.model_selection import StratifiedKFold
 
+
+
+def get_duplicates(dataframe):
+    columns_to_remove = []
+    list_columns = copy.deepcopy(dataframe.columns)
+    i = 1
+    for column1 in list_columns:
+        for column2 in list_columns[i:]:
+            if dataframe[column1].equals(dataframe[column2]):
+                columns_to_remove.append(column1)
+                break
+        i+=1
+    return columns_to_remove
 
 np.random.seed(1053)
 warnings.filterwarnings("ignore") #,message="'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8")
@@ -27,6 +40,8 @@ organomics = organomics[organomics["Patient_ID"].isin(endpoints["PatientID"])]
 ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
+
+res_dict = {}
 for thresh in [.5, .52, .54, .56, .58, .6]:
     total_ci = 0.
     total_cdauc = 0.
@@ -44,6 +59,12 @@ for thresh in [.5, .52, .54, .56, .58, .6]:
 
             Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
                                         endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
+            
+            duplicate_columns = get_duplicates(organomics)
+            for c in duplicate_columns:
+                if c not in ["RFS", "Relapse", "Patient ID"]:
+                    del organomics[c]
+
             X_train = X_train.fillna(0)
             X_test = X_test.fillna(0)
             del X_train["Patient_ID"]
@@ -75,5 +96,7 @@ for thresh in [.5, .52, .54, .56, .58, .6]:
         print(avg_cdauc/5)
         total_ci+=avg_ci/5
         total_cdauc+=avg_cdauc/5
+    res_dict[thresh] = (total_ci/4, total_cdauc/4)
     print(f"{thresh} : {total_ci/4}")
     print(f"{thresh} : {total_cdauc/4}")
+print(res_dict)

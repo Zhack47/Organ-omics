@@ -41,7 +41,7 @@ ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-
+res_dict = {}
 for thresh in tqdm(np.arange(.5, .58, .01)):
     total_ci = 0.
     total_cdauc = 0.
@@ -99,5 +99,7 @@ for thresh in tqdm(np.arange(.5, .58, .01)):
         #print()
         total_ci+=avg_ci/5
         total_cdauc+=avg_cdauc/5
+    res_dict[thresh] = (total_ci/4, total_cdauc/4)
     print(f"{thresh} : {total_ci/4}")
     print(f"{thresh} : {total_cdauc/4}")
+print(res_dict)
