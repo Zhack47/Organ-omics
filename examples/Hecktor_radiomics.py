@@ -41,45 +41,43 @@ ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-res_dict = {}
-for thresh in tqdm(np.arange(.5, .58, .01)):
-    total_ci = 0.
-    total_cdauc = 0.
-    for i in range(4):
-        avg_ci = 0.
-        avg_cdauc = 0.
-        for tr_ids, ts_ids in kfold.split(ids, censored):
-            train_ids = ids[tr_ids]
-            test_ids = ids[ts_ids]
-            patient_ids = radiomics["Patient_ID"]
-            X_train = radiomics[radiomics["Patient_ID"].isin(train_ids)]
-            X_test = radiomics[radiomics["Patient_ID"].isin(test_ids)]
+res_dict = {i:[] for i in np.arange(.52, .58, .01)}
+patient_ids = radiomics["Patient_ID"]
 
-            Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
-                                        endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
+for tr_ids, ts_ids in kfold.split(ids, censored):
+    train_ids = ids[tr_ids]
+    test_ids = ids[ts_ids]
+    X_train = radiomics[radiomics["Patient_ID"].isin(train_ids)]
+    X_test = radiomics[radiomics["Patient_ID"].isin(test_ids)]
+    duplicate_columns = get_duplicates(X_train)
+    for c in duplicate_columns:
+        if c not in ["RFS", "Relapse", "Patient ID"]:
+            del X_train[c]
+    Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
+                                endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
 
-            Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
-                                        endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
-            duplicate_columns = get_duplicates(radiomics)
-            for c in duplicate_columns:
-                if c not in ["RFS", "Relapse", "Patient ID"]:
-                    del radiomics[c]
+    Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
+                                endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
+    X_train = X_train.fillna(0)
+    X_test = X_test.fillna(0)
+    del X_train["Patient_ID"]
+    del X_test["Patient_ID"]
 
-            X_train = X_train.fillna(0)
-            X_test = X_test.fillna(0)
-            del X_train["Patient_ID"]
-            del X_test["Patient_ID"]
-
-            # Feature selection
-            for col in X_train.columns:
-                model = CoxnetSurvivalAnalysis()
-                model.fit(X_train[col].values.reshape(-1, 1), Y_train)
-                corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
-                                                            model.predict(X_train[col].values.reshape(-1, 1)))
-                if corr_score[0] < thresh:
-                    del X_train[col]
-                    del X_test[col]
-
+    # Feature selection
+    for col in X_train.columns:
+        model = CoxnetSurvivalAnalysis()
+        model.fit(X_train[col].values.reshape(-1, 1), Y_train)
+        corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
+                                                    model.predict(X_train[col].values.reshape(-1, 1)))
+        if corr_score[0] < thresh:
+            del X_train[col]
+            del X_test[col]
+    for thresh in tqdm(np.arange(.52, .58, .01)):
+        total_ci = 0.
+        total_cdauc = 0.
+        for i in range(4):
+            avg_ci = 0.
+            avg_cdauc = 0.
             #print(X_train.shape)
             #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
             model = FastSurvivalSVM(max_iter=3)
@@ -99,7 +97,10 @@ for thresh in tqdm(np.arange(.5, .58, .01)):
         #print()
         total_ci+=avg_ci/5
         total_cdauc+=avg_cdauc/5
-    res_dict[thresh] = (total_ci/4, total_cdauc/4)
-    print(f"{thresh} : {total_ci/4}")
-    print(f"{thresh} : {total_cdauc/4}")
+        res_dict[thresh].append(total_ci/4)
+        print(f"{thresh} : {total_ci/4}")
+        print(f"{thresh} : {total_cdauc/4}")
+for k in res_dict.keys():
+    avg = np.mean(res_dict[k])
+    res_dict[k] = avg
 print(res_dict)
