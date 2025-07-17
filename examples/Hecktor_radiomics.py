@@ -24,9 +24,9 @@ radiomics = radiomics[radiomics["Patient_ID"].isin(endpoints["PatientID"])]
 
 ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
-kfold = StratifiedKFold(6, random_state=np.random.randint(0, 100000000), shuffle=True)
+kfold = StratifiedKFold(3, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-for i in range(10):
+for i in range(4):
     avg_ci = 0.
     avg_cdauc = 0.
     for tr_ids, ts_ids in kfold.split(ids, censored):
@@ -56,7 +56,7 @@ for i in range(10):
                 del X_train[col]
                 del X_test[col]
 
-        model = BaggedIcareSurvival(n_jobs=-1)
+        model = BaggedIcareSurvival(n_estimators=1000, n_jobs=-1)
         model.fit(X_train, Y_train)
         y_hat_test = model.predict(X_test)
         y_hat_train = model.predict(X_train)
@@ -68,6 +68,6 @@ for i in range(10):
         avg_cdauc += cd_auc[1]
         #print(ci)
         #print(cd_auc[1])
-    print(avg_ci/6)
-    print(avg_cdauc/6)
+    print(avg_ci/3)
+    print(avg_cdauc/3)
     print()

@@ -25,9 +25,9 @@ organomics = organomics[organomics["Patient_ID"].isin(endpoints["PatientID"])]
 
 ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
-kfold = StratifiedKFold(6, random_state=np.random.randint(0, 100000000), shuffle=True)
+kfold = StratifiedKFold(3, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-for i in range(10):
+for i in range(4):
     avg_ci = 0.
     avg_cdauc = 0.
     for tr_ids, ts_ids in kfold.split(ids, censored):
@@ -67,5 +67,5 @@ for i in range(10):
         avg_cdauc += cd_auc[1]
 #        print(ci)
 #        print(cd_auc[1])
-    print(avg_ci/6)
-    print(avg_cdauc/6)
+    print(avg_ci/3)
+    print(avg_cdauc/3)
