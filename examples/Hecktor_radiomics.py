@@ -74,9 +74,10 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
             if corr_score[0] < thresh:
                 del X_train[col]
                 del X_test[col]
+
+        avg_ci = 0.
+        avg_cdauc = 0.
         for i in range(4):
-            avg_ci = 0.
-            avg_cdauc = 0.
             #print(X_train.shape)
             #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
             model = FastSurvivalSVM(max_iter=3)
@@ -94,9 +95,7 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
         #print(avg_ci/5)
         #print(avg_cdauc/5)
         #print()
-        res_dict[thresh].append(total_ci/4)
-        print(f"{thresh} : {total_ci/4}")
-        print(f"{thresh} : {total_cdauc/4}")
+        res_dict[thresh].append(avg_ci/4)
 for k in res_dict.keys():
     avg = np.mean(res_dict[k])
     res_dict[k] = avg
