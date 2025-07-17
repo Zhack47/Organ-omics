@@ -25,7 +25,7 @@ radiomics = radiomics[radiomics["Patient_ID"].isin(endpoints["PatientID"])]
 
 ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
-kfold = StratifiedKFold(3, random_state=np.random.randint(0, 100000000), shuffle=True)
+kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
 
 for thresh in [.5, .52, .54, .56, .58]:
@@ -75,10 +75,10 @@ for thresh in [.5, .52, .54, .56, .58]:
             avg_cdauc += cd_auc[1]
             #print(ci)
             #print(cd_auc[1])
-        print(avg_ci/3)
-        print(avg_cdauc/3)
+        print(avg_ci/5)
+        print(avg_cdauc/5)
         print()
-        total_ci+=avg_ci/3
-        total_cdauc+=avg_cdauc/3
+        total_ci+=avg_ci/5
+        total_cdauc+=avg_cdauc/5
     print(f"{thresh} : {total_ci/4}")
     print(f"{thresh} : {total_cdauc/4}")
