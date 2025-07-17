@@ -41,7 +41,7 @@ ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-res_dict = {}
+res_dict = {i:[] for i in np.arange(.52, .58, .001)}
 for tr_ids, ts_ids in kfold.split(ids, censored):
     train_ids = ids[tr_ids]
     test_ids = ids[ts_ids]
@@ -64,7 +64,7 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
     del X_train["Patient_ID"]
     del X_test["Patient_ID"]
 
-    for thresh in [.5, .52, .54, .56, .58]:
+    for thresh in {i:[] for i in np.arange(.52, .58, .001)}:
         # Feature selection
         for col in tqdm(X_train.columns):
             model = CoxnetSurvivalAnalysis()

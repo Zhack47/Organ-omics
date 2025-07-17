@@ -64,7 +64,7 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
     del X_train["Patient_ID"]
     del X_test["Patient_ID"]
 
-    for thresh in tqdm(np.arange(.52, .58, .01)):
+    for thresh in tqdm(np.arange(.52, .58, .001)):
         # Feature selection
         for col in X_train.columns:
             model = CoxnetSurvivalAnalysis()
