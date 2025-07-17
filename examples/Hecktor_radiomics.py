@@ -27,50 +27,57 @@ ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(3, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-for i in range(4):
-    avg_ci = 0.
-    avg_cdauc = 0.
-    for tr_ids, ts_ids in kfold.split(ids, censored):
-        train_ids = ids[tr_ids]
-        test_ids = ids[ts_ids]
-        patient_ids = radiomics["Patient_ID"]
-        X_train = radiomics[radiomics["Patient_ID"].isin(train_ids)]
-        X_test = radiomics[radiomics["Patient_ID"].isin(test_ids)]
+total_ci = 0.
+total_cdauc = 0.
+for thresh in [.5, .52, .54, .56, .58]:
+    for i in range(4):
+        avg_ci = 0.
+        avg_cdauc = 0.
+        for tr_ids, ts_ids in kfold.split(ids, censored):
+            train_ids = ids[tr_ids]
+            test_ids = ids[ts_ids]
+            patient_ids = radiomics["Patient_ID"]
+            X_train = radiomics[radiomics["Patient_ID"].isin(train_ids)]
+            X_test = radiomics[radiomics["Patient_ID"].isin(test_ids)]
 
-        Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
-                                    endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
+            Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
+                                        endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
 
-        Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
-                                    endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
-        X_train = X_train.fillna(0)
-        X_test = X_test.fillna(0)
-        del X_train["Patient_ID"]
-        del X_test["Patient_ID"]
+            Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
+                                        endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
+            X_train = X_train.fillna(0)
+            X_test = X_test.fillna(0)
+            del X_train["Patient_ID"]
+            del X_test["Patient_ID"]
 
-        # Feature selection
-        for col in tqdm(X_train.columns):
-            model = CoxnetSurvivalAnalysis()
-            model.fit(X_train[col].values.reshape(-1, 1), Y_train)
-            corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
-                                                        model.predict(X_train[col].values.reshape(-1, 1)))
-            if corr_score[0] <.56:
-                del X_train[col]
-                del X_test[col]
+            # Feature selection
+            for col in tqdm(X_train.columns):
+                model = CoxnetSurvivalAnalysis()
+                model.fit(X_train[col].values.reshape(-1, 1), Y_train)
+                corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
+                                                            model.predict(X_train[col].values.reshape(-1, 1)))
+                if corr_score[0] <.56:
+                    del X_train[col]
+                    del X_test[col]
 
-        print(X_train.shape)
-        model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
-        #model = FastSurvivalSVM()
-        model.fit(X_train, Y_train)
-        y_hat_test = model.predict(X_test)
-        y_hat_train = model.predict(X_train)
-        ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
-        time_points = np.arange(Y_test["time"][np.argpartition(Y_test["time"],5)[5]],
-                                        Y_test["time"][np.argpartition(Y_test["time"],-5)[-5]], 50)
-        cd_auc = cumulative_dynamic_auc(Y_train, Y_test, y_hat_test, times=time_points)
-        avg_ci += ci[0]
-        avg_cdauc += cd_auc[1]
-        #print(ci)
-        #print(cd_auc[1])
-    print(avg_ci/3)
-    print(avg_cdauc/3)
-    print()
+            print(X_train.shape)
+            model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
+            #model = FastSurvivalSVM()
+            model.fit(X_train, Y_train)
+            y_hat_test = model.predict(X_test)
+            y_hat_train = model.predict(X_train)
+            ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
+            time_points = np.arange(Y_test["time"][np.argpartition(Y_test["time"],5)[5]],
+                                            Y_test["time"][np.argpartition(Y_test["time"],-5)[-5]], 50)
+            cd_auc = cumulative_dynamic_auc(Y_train, Y_test, y_hat_test, times=time_points)
+            avg_ci += ci[0]
+            avg_cdauc += cd_auc[1]
+            #print(ci)
+            #print(cd_auc[1])
+        print(avg_ci/3)
+        print(avg_cdauc/3)
+        print()
+        total_ci+=avg_ci
+        total_cdauc+=avg_cdauc
+    print(f"{thresh} : {total_ci/4}")
+    print(f"{thresh} : {total_cdauc/4}")
