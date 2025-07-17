@@ -1,5 +1,6 @@
 
 import sys
+import copy
 import warnings
 import numpy as np
 import pandas as pd
@@ -11,6 +12,19 @@ from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from sklearn.model_selection import StratifiedKFold
 from icare.survival import BaggedIcareSurvival
 
+
+
+def get_duplicates(dataframe):
+    columns_to_remove = []
+    list_columns = copy.deepcopy(dataframe.columns)
+    i = 1
+    for column1 in list_columns:
+        for column2 in list_columns[i:]:
+            if dataframe[column1].equals(dataframe[column2]):
+                columns_to_remove.append(column1)
+                break
+        i+=1
+    return columns_to_remove
 
 np.random.seed(1053)
 warnings.filterwarnings("ignore") #,message="'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8")
@@ -46,6 +60,11 @@ for thresh in tqdm(np.arange(.5, .58, .01)):
 
             Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
                                         endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
+            duplicate_columns = get_duplicates(radiomics)
+            for c in duplicate_columns:
+                if c not in ["RFS", "Relapse", "Patient ID"]:
+                    del radiomics[c]
+
             X_train = X_train.fillna(0)
             X_test = X_test.fillna(0)
             del X_train["Patient_ID"]
