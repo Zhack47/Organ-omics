@@ -41,7 +41,7 @@ ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-res_dict = {i:[] for i in np.arange(.52, .58, .01)}
+res_dict = {i:[] for i in np.arange(.52, .58, .001)}
 patient_ids = radiomics["Patient_ID"]
 
 for tr_ids, ts_ids in kfold.split(ids, censored):
@@ -78,8 +78,6 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
         avg_ci = 0.
         avg_cdauc = 0.
         for i in range(4):
-            #print(X_train.shape)
-            #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
             model = FastSurvivalSVM(max_iter=3)
             model.fit(X_train, Y_train)
             y_hat_test = model.predict(X_test)
@@ -90,12 +88,9 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
             cd_auc = cumulative_dynamic_auc(Y_train, Y_test, y_hat_test, times=time_points)
             avg_ci += ci[0]
             avg_cdauc += cd_auc[1]
-            #print(ci)
-            #print(cd_auc[1])
-        #print(avg_ci/5)
-        #print(avg_cdauc/5)
-        #print()
         res_dict[thresh].append(avg_ci/4)
+
+print(res_dict)
 for k in res_dict.keys():
     avg = np.mean(res_dict[k])
     res_dict[k] = avg
