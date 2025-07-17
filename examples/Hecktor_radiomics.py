@@ -28,7 +28,7 @@ censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
 
-for thresh in [.5, .52, .54, .56, .58]:
+for thresh in tqdm([.5, .52, .54, .56, .58]):
     total_ci = 0.
     total_cdauc = 0.
     for i in range(4):
@@ -52,7 +52,7 @@ for thresh in [.5, .52, .54, .56, .58]:
             del X_test["Patient_ID"]
 
             # Feature selection
-            for col in tqdm(X_train.columns):
+            for col in X_train.columns:
                 model = CoxnetSurvivalAnalysis()
                 model.fit(X_train[col].values.reshape(-1, 1), Y_train)
                 corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
@@ -61,7 +61,7 @@ for thresh in [.5, .52, .54, .56, .58]:
                     del X_train[col]
                     del X_test[col]
 
-            print(X_train.shape)
+            #print(X_train.shape)
             #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
             model = FastSurvivalSVM()
             model.fit(X_train, Y_train)
@@ -75,9 +75,9 @@ for thresh in [.5, .52, .54, .56, .58]:
             avg_cdauc += cd_auc[1]
             #print(ci)
             #print(cd_auc[1])
-        print(avg_ci/5)
-        print(avg_cdauc/5)
-        print()
+        #print(avg_ci/5)
+        #print(avg_cdauc/5)
+        #print()
         total_ci+=avg_ci/5
         total_cdauc+=avg_cdauc/5
     print(f"{thresh} : {total_ci/4}")
