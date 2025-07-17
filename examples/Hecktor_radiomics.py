@@ -40,8 +40,8 @@ radiomics = radiomics[radiomics["Patient_ID"].isin(endpoints["PatientID"])]
 ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
-
-res_dict = {i:[] for i in np.arange(.52, .58, .001)}
+thresh_range = np.arange(.52, .58, .01)
+res_dict = {i:[] for i in thresh_range}
 patient_ids = radiomics["Patient_ID"]
 
 list_models = [FastSurvivalSVM(max_iter=3),
@@ -55,7 +55,7 @@ list_models = [FastSurvivalSVM(max_iter=3),
               ]
 with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
-    for t in np.arange(.52, .58, .01):
+    for t in thresh_range:
         csvfile.write(f",{t}")
     for model in list_models:
         for tr_ids, ts_ids in kfold.split(ids, censored):
@@ -78,7 +78,7 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
             del X_train["Patient_ID"]
             del X_test["Patient_ID"]
 
-            for thresh in tqdm(np.arange(.52, .58, .001)):
+            for thresh in tqdm(thresh_range):
                 # Feature selection
                 for col in X_train.columns:
                     model = CoxnetSurvivalAnalysis()
