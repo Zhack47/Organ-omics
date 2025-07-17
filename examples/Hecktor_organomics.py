@@ -64,9 +64,9 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
     del X_train["Patient_ID"]
     del X_test["Patient_ID"]
 
-    for thresh in {i:[] for i in np.arange(.52, .58, .001)}:
+    for thresh in tqdm(np.arange(.52, .58, .001)):
         # Feature selection
-        for col in tqdm(X_train.columns):
+        for col in X_train.columns:
             model = CoxnetSurvivalAnalysis()
             model.fit(X_train[col].values.reshape(-1, 1), Y_train)
             corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
