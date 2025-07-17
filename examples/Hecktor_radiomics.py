@@ -57,7 +57,7 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
     for t in thresh_range:
         csvfile.write(f",{t}")
-    csvfile.write(f"\n")
+    csvfile.write("\n")
     for model in list_models:
         print(model.__str__())
         for tr_ids, ts_ids in kfold.split(ids, censored):
@@ -105,8 +105,8 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
                     avg_ci += ci[0]
                     avg_cdauc += cd_auc[1]
                 res_dict[thresh].append(avg_ci/4)
-    csvfile.write(f"{model.__str__()}")
-    for k in res_dict.keys():
-        avg = np.mean(res_dict[k])
-        csvfile.write(f",{avg}")
-    csvfile.write(f"\n")
+        csvfile.write(f"{model.__str__()}")
+        for k in res_dict.keys():
+            avg = np.mean(res_dict[k])
+            csvfile.write(f",{avg}")
+        csvfile.write("\n")
