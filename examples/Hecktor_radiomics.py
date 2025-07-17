@@ -82,7 +82,7 @@ for thresh in tqdm(np.arange(.5, .58, .01)):
 
             #print(X_train.shape)
             #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
-            model = FastSurvivalSVM()
+            model = FastSurvivalSVM(max_iter=3)
             model.fit(X_train, Y_train)
             y_hat_test = model.predict(X_test)
             y_hat_train = model.predict(X_train)
