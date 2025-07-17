@@ -62,8 +62,8 @@ for thresh in [.5, .52, .54, .56, .58]:
                     del X_test[col]
 
             print(X_train.shape)
-            model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
-            #model = FastSurvivalSVM()
+            #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
+            model = FastSurvivalSVM()
             model.fit(X_train, Y_train)
             y_hat_test = model.predict(X_test)
             y_hat_train = model.predict(X_train)
