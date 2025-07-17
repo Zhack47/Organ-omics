@@ -52,7 +52,7 @@ for i in range(10):
             model.fit(X_train[col].values.reshape(-1, 1), Y_train)
             corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
                                                         model.predict(X_train[col].values.reshape(-1, 1)))
-            if corr_score[0] <.5:
+            if corr_score[0] <.56:
                 del X_train[col]
                 del X_test[col]
 
