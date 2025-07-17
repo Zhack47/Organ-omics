@@ -57,7 +57,9 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
     for t in thresh_range:
         csvfile.write(f",{t}")
+    csvfile.write(f"\n")
     for model in list_models:
+        print(model.__str__())
         for tr_ids, ts_ids in kfold.split(ids, censored):
             train_ids = ids[tr_ids]
             test_ids = ids[ts_ids]
@@ -81,8 +83,8 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
             for thresh in tqdm(thresh_range):
                 # Feature selection
                 for col in X_train.columns:
-                    model = CoxnetSurvivalAnalysis()
-                    model.fit(X_train[col].values.reshape(-1, 1), Y_train)
+                    fs_model = CoxnetSurvivalAnalysis()
+                    fs_model.fit(X_train[col].values.reshape(-1, 1), Y_train)
                     corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
                                                                 model.predict(X_train[col].values.reshape(-1, 1)))
                     if corr_score[0] < thresh:
