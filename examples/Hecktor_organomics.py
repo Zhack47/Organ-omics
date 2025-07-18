@@ -107,7 +107,7 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                     avg_ci += ci[0]
                     avg_cdauc += cd_auc[1]
                 res_dict[thresh].append(avg_ci/4)
-        csvfile.write(f"{model.__str__().replace(",", " ")}")
+        csvfile.write(f"{model.__str__().replace(',', ' ')}")
         print(res_dict)
         for k in res_dict.keys():
             avg = np.mean(res_dict[k])
