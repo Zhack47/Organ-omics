@@ -41,7 +41,7 @@ ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-thresh_range = np.arange(.52, .58, .001)
+thresh_range = np.arange(.52, .58, .01)
 
 list_models = [FastSurvivalSVM(max_iter=3),
               FastSurvivalSVM(max_iter=10),
@@ -86,10 +86,10 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
             for thresh in tqdm(np.arange(.52, .58, .001)):
                 # Feature selection
                 for col in X_train.columns:
-                    model = CoxnetSurvivalAnalysis()
-                    model.fit(X_train[col].values.reshape(-1, 1), Y_train)
+                    fs_model = CoxnetSurvivalAnalysis()
+                    fs_model.fit(X_train[col].values.reshape(-1, 1), Y_train)
                     corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
-                                                                model.predict(X_train[col].values.reshape(-1, 1)))
+                                                                fs_model.predict(X_train[col].values.reshape(-1, 1)))
                     if corr_score[0] < thresh:
                         del X_train[col]
                         del X_test[col]
@@ -98,7 +98,6 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                 avg_cdauc = 0.
                 for i in range(4):
                     #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
-                    model = FastSurvivalSVM(max_iter=3)
                     model.fit(X_train, Y_train)
                     y_hat_test = model.predict(X_test)
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)

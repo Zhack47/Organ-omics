@@ -112,19 +112,27 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
 
                 avg_ci = 0.
                 avg_cdauc = 0.
-                for i in range(4):
-                    #model = FastSurvivalSVM(max_iter=3)
+                for i in range(4):  # Number of repetitions
+                    # Model training and scoring
                     model.fit(X_train, Y_train)
                     y_hat_test = model.predict(X_test)
                     y_hat_train = model.predict(X_train)
+                    # Concordance Index
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
+                    # Cumulative-Dynamic AUC
                     time_points = np.arange(Y_test["time"][np.argpartition(Y_test["time"],5)[5]],
                                                     Y_test["time"][np.argpartition(Y_test["time"],-5)[-5]], 50)
                     cd_auc = cumulative_dynamic_auc(Y_train, Y_test, y_hat_test, times=time_points)
                     avg_ci += ci[0]
                     avg_cdauc += cd_auc[1]
                 res_dict[thresh].append(avg_ci/4)
-        csvfile.write(f"{model.__str__()}")
+ 
+        # All thresholds for all folds have been scored
+        # Let's write the results to a csv file
+        
+        # Replacing commas to keep good CSV structure
+        csvfile.write(f"{model.__str__().replace(',', ' ')}")
+        
         for k in res_dict.keys():
             avg = np.mean(res_dict[k])
             csvfile.write(f",{avg}")
