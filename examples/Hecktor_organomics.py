@@ -41,18 +41,19 @@ ids = endpoints["PatientID"]
 censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
-thresh_range = np.arange(.52, .58, .01)
+thresh_range = np.arange(.52, .58, .001)
 
-list_models = [FastSurvivalSVM(max_iter=3),
+list_models = [CoxnetSurvivalAnalysis(n_alphas=10),
+              CoxnetSurvivalAnalysis(n_alphas=100),
+              FastSurvivalSVM(max_iter=2),
+              FastSurvivalSVM(max_iter=10),
               FastSurvivalSVM(max_iter=100),
-              CoxnetSurvivalAnalysis()
-              #FastSurvivalSVM(max_iter=100),
-              #FastSurvivalSVM(max_iter=1000),
-              #BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
-              #BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
+              FastSurvivalSVM(max_iter=1000),
+              BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
+              BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
               ]
 with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
@@ -61,7 +62,7 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
     csvfile.write("\n")
     for model in list_models:
         res_dict = {i:[] for i in thresh_range}
-        print(model.__str__().replace(",", " "))
+        print(str(model).replace(",", " "))
         for tr_ids, ts_ids in kfold.split(ids, censored):
             train_ids = ids[tr_ids]
             test_ids = ids[ts_ids]
@@ -107,7 +108,7 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                     avg_ci += ci[0]
                     avg_cdauc += cd_auc[1]
                 res_dict[thresh].append(avg_ci/4)
-        csvfile.write(f"{model.__str__().replace(',', ' ')}")
+        csvfile.write(f"{str(model).replace(',', ' ')}")
         for k in res_dict.keys():
             avg = np.mean(res_dict[k])
             csvfile.write(f",{avg}")            
