@@ -44,7 +44,8 @@ kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle
 thresh_range = np.arange(.52, .58, .01)
 
 list_models = [FastSurvivalSVM(max_iter=3),
-              FastSurvivalSVM(max_iter=10),
+              FastSurvivalSVM(max_iter=100),
+              CoxnetSurvivalAnalysis()
               #FastSurvivalSVM(max_iter=100),
               #FastSurvivalSVM(max_iter=1000),
               #BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
@@ -97,7 +98,6 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                 avg_ci = 0.
                 avg_cdauc = 0.
                 for i in range(4):
-                    #model = BaggedIcareSurvival(n_estimators=100, n_jobs=-1)
                     model.fit(X_train, Y_train)
                     y_hat_test = model.predict(X_test)
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
