@@ -42,12 +42,12 @@ censored = endpoints["Relapse"]
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
 
 thresh_range = np.arange(.52, .58, .001)
-res_dict = {i:[] for i in thresh_range}
 
 list_models = [FastSurvivalSVM(max_iter=3),
-              FastSurvivalSVM(max_iter=100),
+              FastSurvivalSVM(max_iter=10),
+              #FastSurvivalSVM(max_iter=100),
               #FastSurvivalSVM(max_iter=1000),
-              BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
               #BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
               #BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
               #BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
@@ -59,6 +59,7 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
         csvfile.write(f",{t}")
     csvfile.write("\n")
     for model in list_models:
+        res_dict = {i:[] for i in thresh_range}
         print(model.__str__().replace(",", " "))
         for tr_ids, ts_ids in kfold.split(ids, censored):
             train_ids = ids[tr_ids]
@@ -108,7 +109,6 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                     avg_cdauc += cd_auc[1]
                 res_dict[thresh].append(avg_ci/4)
         csvfile.write(f"{model.__str__().replace(',', ' ')}")
-        print(res_dict)
         for k in res_dict.keys():
             avg = np.mean(res_dict[k])
             csvfile.write(f",{avg}")            

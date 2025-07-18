@@ -15,6 +15,9 @@ from icare.survival import BaggedIcareSurvival
 
 
 def get_duplicates(dataframe):
+    """
+    Returns a list of duplicate columns (i.e.: columns with an identical column existing somewhere else in the dataframe)
+    """
     columns_to_remove = []
     list_columns = copy.deepcopy(dataframe.columns)
     i = 1
@@ -26,24 +29,29 @@ def get_duplicates(dataframe):
         i+=1
     return columns_to_remove
 
+# Set random seed
 np.random.seed(1053)
-warnings.filterwarnings("ignore") #,message="'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8")
 
-radiomics_path = sys.argv[1]
-endpoints_path = sys.argv[2]
+# FutureWarning is annoying
+warnings.filterwarnings("ignore", message="'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8")
+
+
+radiomics_path = sys.argv[1]  # Path to radiomic features csv
+endpoints_path = sys.argv[1]  # Path to Hecktor endpoints file
+
+# Read files to pandas Dataframes
 radiomics = pd.read_csv(radiomics_path)
 endpoints = pd.read_csv(endpoints_path)
 
 # Remove samples with no endpoint
 radiomics = radiomics[radiomics["Patient_ID"].isin(endpoints["PatientID"])]
 
-ids = endpoints["PatientID"]
-censored = endpoints["Relapse"]
+ids = endpoints["PatientID"]  # Gather all patient IDs
+censored = endpoints["Relapse"]  # Gather the censoring data (0/1) for stratification
 kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
-thresh_range = np.arange(.52, .58, .001)
-res_dict = {i:[] for i in thresh_range}
-patient_ids = radiomics["Patient_ID"]
+thresh_range = np.arange(.52, .58, .001)  # Range of tested threshold for feature selection (UCI)
 
+# Define the models that should be tested
 list_models = [FastSurvivalSVM(max_iter=3),
               FastSurvivalSVM(max_iter=100),
               FastSurvivalSVM(max_iter=1000),
@@ -53,30 +61,41 @@ list_models = [FastSurvivalSVM(max_iter=3),
               BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
               BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
               ]
+
 with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
     for t in thresh_range:
         csvfile.write(f",{t}")
     csvfile.write("\n")
+
     for model in list_models:
+        res_dict = {i:[] for i in thresh_range}
         print(model.__str__().replace(",", " "))
+        # CV folds
         for tr_ids, ts_ids in kfold.split(ids, censored):
+            # Split train and valid data
             train_ids = ids[tr_ids]
             test_ids = ids[ts_ids]
             X_train = radiomics[radiomics["Patient_ID"].isin(train_ids)]
             X_test = radiomics[radiomics["Patient_ID"].isin(test_ids)]
-            duplicate_columns = get_duplicates(X_train)
-            for c in duplicate_columns:
-                if c not in ["RFS", "Relapse", "Patient ID"]:
-                    del X_train[c]
-                    del X_test[c]
             Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
                                         endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
 
             Y_test = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(test_ids)]["Relapse"],
                                         endpoints[endpoints["PatientID"].isin(test_ids)]["RFS"])
+            
+            # Remove duplicates
+            duplicate_columns = get_duplicates(X_train)
+            for c in duplicate_columns:
+                if c not in ["RFS", "Relapse", "Patient ID"]:
+                    del X_train[c]
+                    del X_test[c]
+            
+            # Replace NaNs by 0
             X_train = X_train.fillna(0)
             X_test = X_test.fillna(0)
+
+            # Remove Patient_ID from input columns 
             del X_train["Patient_ID"]
             del X_test["Patient_ID"]
 
