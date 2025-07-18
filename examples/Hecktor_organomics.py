@@ -83,7 +83,7 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
             del X_train["Patient_ID"]
             del X_test["Patient_ID"]
 
-            for thresh in tqdm(np.arange(.52, .58, .001)):
+            for thresh in tqdm(thresh_range):
                 # Feature selection
                 for col in X_train.columns:
                     fs_model = CoxnetSurvivalAnalysis()
