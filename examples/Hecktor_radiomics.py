@@ -44,7 +44,6 @@ clinical_path = sys.argv[3]  # Path to Hecktor clinical data file
 radiomics = pd.read_csv(radiomics_path)
 endpoints = pd.read_csv(endpoints_path)
 clinical_data = pd.read_csv(clinical_path)
-clinical_data = clinical_data[clinical_data["Task 2"]==1]
 del clinical_data["Task 1"]
 del clinical_data["Task 2"]
 
