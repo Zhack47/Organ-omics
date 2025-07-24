@@ -66,13 +66,13 @@ thresh_range = np.arange(.52, .58, .001)  # Range of tested threshold for featur
 
 # Define the models that should be tested
 list_models = [FastSurvivalSVM(max_iter=3),
-              FastSurvivalSVM(max_iter=100),
-              FastSurvivalSVM(max_iter=1000),
+              #FastSurvivalSVM(max_iter=100),
+              #FastSurvivalSVM(max_iter=1000),
               BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
-              BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
-              BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
-              BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
-              BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
               ]
 
 with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
