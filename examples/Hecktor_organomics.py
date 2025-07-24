@@ -52,6 +52,7 @@ organomics = pd.merge(organomics, clinical_data, left_index=True, right_index=Tr
 organomics.insert(0, "Patient_ID", idx)
 del clinical_data
 
+
 # Remove samples with no endpoint
 organomics = organomics[organomics["Patient_ID"].isin(endpoints["PatientID"])]
 
