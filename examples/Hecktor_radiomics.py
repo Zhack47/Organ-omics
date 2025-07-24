@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from sksurv. util import Surv
+from sksurv.util import Surv
 from sksurv.svm import FastSurvivalSVM
 from sksurv.metrics import concordance_index_censored, cumulative_dynamic_auc
 from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
