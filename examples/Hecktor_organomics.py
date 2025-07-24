@@ -28,11 +28,29 @@ def get_duplicates(dataframe):
 
 np.random.seed(1053)
 warnings.filterwarnings("ignore") #,message="'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8")
-organomics_path = sys.argv[1]
-endpoints_path = sys.argv[2]
+organomics_path = sys.argv[1]  # Path to organomic features csv
+endpoints_path = sys.argv[2]  # Path to Hecktor endpoints file
+clinical_path = sys.argv[3]  # Path to Hecktor clinical data file
 organomics = pd.read_csv(organomics_path)
 endpoints = pd.read_csv(endpoints_path)
+clinical_data = pd.read_csv(clinical_path)
+clinical_data["Gender"] = clinical_data["Gender"].apply(lambda x: 1 if x =="M" else 2)
+clinical_data["Tobacco"] = clinical_data["Tobacco"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
+clinical_data["Surgery"] = clinical_data["Surgery"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
+clinical_data["Chemotherapy"] =clinical_data["Chemotherapy"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
+clinical_data["Performance status"] =clinical_data["Performance status"].apply(lambda x: x+1 if x in (0,1,2,3,4) else 0)
+clinical_data["HPV status (0=-, 1=+)"] = clinical_data["HPV status (0=-, 1=+)"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
+del clinical_data["Task 1"]
+del clinical_data["Task 2"]
 
+
+
+organomics.set_index('Patient_ID', inplace=True)
+clinical_data.set_index('PatientID', inplace=True)
+idx = organomics.index
+radiomics = pd.merge(organomics, clinical_data, left_index=True, right_index=True)
+radiomics.insert(0, "Patient_ID", idx)
+del clinical_data
 
 # Remove samples with no endpoint
 organomics = organomics[organomics["Patient_ID"].isin(endpoints["PatientID"])]
@@ -45,15 +63,15 @@ thresh_range = np.arange(.52, .58, .001)
 
 list_models = [CoxnetSurvivalAnalysis(n_alphas=10),
               CoxnetSurvivalAnalysis(n_alphas=100),
-              FastSurvivalSVM(max_iter=2),
+              FastSurvivalSVM(max_iter=3),
               FastSurvivalSVM(max_iter=10),
               FastSurvivalSVM(max_iter=100),
-              FastSurvivalSVM(max_iter=1000),
+              #FastSurvivalSVM(max_iter=1000),
               BaggedIcareSurvival(n_estimators=10, n_jobs=-1),
               BaggedIcareSurvival(n_estimators=100, n_jobs=-1),
-              BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
-              BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
-              BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=200, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=500, n_jobs=-1),
+              #BaggedIcareSurvival(n_estimators=1000, n_jobs=-1),
               ]
 with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
     csvfile.write("Model")
