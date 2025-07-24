@@ -48,8 +48,8 @@ del clinical_data["Task 2"]
 organomics.set_index('Patient_ID', inplace=True)
 clinical_data.set_index('PatientID', inplace=True)
 idx = organomics.index
-radiomics = pd.merge(organomics, clinical_data, left_index=True, right_index=True)
-radiomics.insert(0, "Patient_ID", idx)
+organomics = pd.merge(organomics, clinical_data, left_index=True, right_index=True)
+organomics.insert(0, "Patient_ID", idx)
 del clinical_data
 
 # Remove samples with no endpoint
