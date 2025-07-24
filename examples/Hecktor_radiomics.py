@@ -44,11 +44,20 @@ clinical_path = sys.argv[3]  # Path to Hecktor clinical data file
 radiomics = pd.read_csv(radiomics_path)
 endpoints = pd.read_csv(endpoints_path)
 clinical_data = pd.read_csv(clinical_path)
+clinical_data["Gender"] = clinical_data["Gender"].apply(lambda x: 1 if x =="M" else 2)
+clinical_data["Tobacco"] = clinical_data["Tobacco"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
+clinical_data["Surgery"] = clinical_data["Surgery"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
+clinical_data["Chemotherapy"] =clinical_data["Chemotherapy"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
+clinical_data["Performance status"] =clinical_data["Performance status"].apply(lambda x: x+1 if x in (0,1,2,3,4) else 0)
+clinical_data["HPV status (0=-, 1=+)"] = clinical_data["HPV status (0=-, 1=+)"].apply(lambda x: 1 if x ==1 else -1 if x==0 else 0)
 del clinical_data["Task 1"]
 del clinical_data["Task 2"]
 
+
+
 radiomics.set_index('Patient_ID', inplace=True)
 clinical_data.set_index('PatientID', inplace=True)
+clinical_data["Gender"] = clinical_data
 idx = radiomics.index
 radiomics = pd.merge(radiomics, clinical_data, left_index=True, right_index=True)
 radiomics.insert(0, "Patient_ID", idx)
