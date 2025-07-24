@@ -37,14 +37,27 @@ warnings.filterwarnings("ignore", message="'force_all_finite' was renamed to 'en
 
 
 radiomics_path = sys.argv[1]  # Path to radiomic features csv
-endpoints_path = sys.argv[1]  # Path to Hecktor endpoints file
+endpoints_path = sys.argv[2]  # Path to Hecktor endpoints file
+clinical_path = sys.argv[3]  # Path to Hecktor clinical data file
 
 # Read files to pandas Dataframes
 radiomics = pd.read_csv(radiomics_path)
 endpoints = pd.read_csv(endpoints_path)
+clinical_data = pd.read_csv(clinical_path)
+clinical_data = clinical_data[clinical_data["Task 2"]==1]
+del clinical_data["Task 1"]
+del clinical_data["Task 2"]
+
+radiomics.set_index('Patient_ID', inplace=True)
+clinical_data.set_index('PatientID', inplace=True)
+idx = radiomics.index
+radiomics = pd.merge(radiomics, clinical_data, left_index=True, right_index=True)
+radiomics.insert(0, "Patient_ID", idx)
+
 
 # Remove samples with no endpoint
 radiomics = radiomics[radiomics["Patient_ID"].isin(endpoints["PatientID"])]
+clinical_data = clinical_data[clinical_data["PatientID"].isin(endpoints["PatientID"])]
 
 ids = endpoints["PatientID"]  # Gather all patient IDs
 censored = endpoints["Relapse"]  # Gather the censoring data (0/1) for stratification
