@@ -52,11 +52,10 @@ clinical_data.set_index('PatientID', inplace=True)
 idx = radiomics.index
 radiomics = pd.merge(radiomics, clinical_data, left_index=True, right_index=True)
 radiomics.insert(0, "Patient_ID", idx)
-
+del clinical_data
 
 # Remove samples with no endpoint
 radiomics = radiomics[radiomics["Patient_ID"].isin(endpoints["PatientID"])]
-clinical_data = clinical_data[clinical_data["PatientID"].isin(endpoints["PatientID"])]
 
 ids = endpoints["PatientID"]  # Gather all patient IDs
 censored = endpoints["Relapse"]  # Gather the censoring data (0/1) for stratification
