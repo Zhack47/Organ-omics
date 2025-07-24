@@ -57,7 +57,6 @@ del clinical_data["Task 2"]
 
 radiomics.set_index('Patient_ID', inplace=True)
 clinical_data.set_index('PatientID', inplace=True)
-clinical_data["Gender"] = clinical_data
 idx = radiomics.index
 radiomics = pd.merge(radiomics, clinical_data, left_index=True, right_index=True)
 radiomics.insert(0, "Patient_ID", idx)
