@@ -1,11 +1,15 @@
 # Organ-omics
+
 ## Organ radiomics extraction in python
 
-This repository features the code needed to perform automated organ segmentation (using TotalSegmentator) and organ radiomic features extraction (using pyRadiomics).
+This repository features the code needed to perform:
+- automated organ segmentation (using [TotalSegmentator](https://github.com/wasserth/TotalSegmentator))
+-  organ-omic (and radiomic) features extraction (using [pyRadiomics](https://github.com/AIM-Harvard/pyradiomics/))
 
-## Organs segmentation
 
-The dataset must be in the nnUNet format:
+## Data format
+
+Your data should be organized following the nnUNet dataset format:
 
 ```bash
 dataset_path
@@ -16,13 +20,15 @@ dataset_path
      ├── P002_0000.nii.gz
      ├── P002_0001.nii.gz
      ├── ...
-  └── labelsTr/  # This will be the folder containing organ contours once they are extracted
+  └── labelsTr/
       ├── P001.nii.gz
       ├── P002.nii.gz
       ├── ...
 ```
 
-```dataset.json``` should be constructed as shown in [this exemple](data/Dataset001_Test/dataset.json)
+If you only want to extract organomic features, labelsTs can be empty. It will be used to store organ contours once they are extracted. If you want to extract radiomic features of a lesion class, labelsTs should contain the contours of these lesions for each patient.
+
+The file ```dataset.json``` should be constructed as shown in [this exemple](data/Dataset001_Test/dataset.json)
 
 ### Extract organs contours
 
@@ -36,3 +42,8 @@ Once the organ segmentation have ben extracted and are placed in the `labelsTr` 
 
 ```python3 extract_organomics -d <dataset_path> -o <csv_file_organomics_output_path>```
 
+## Radiomics extraction
+
+To compare organomics and radiomics performance, wealso developped an automated radiomics extraction pipeline. To run this pipeline, you need a dataset structured as defined above, with lesion segmentatins placed in the labelsTs folder. Run it with the following command:
+
+```python3 extract_radiomics -d <dataset_path> -o <csv_file_radiomics_output_path>```
