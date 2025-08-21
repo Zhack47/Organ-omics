@@ -40,10 +40,10 @@ def resample_image_to_spacing(image, spacing):
     resampler.SetSize(new_size)
     resampler.SetOutputSpacing(spacing)
     resampled_image = resampler.Execute(image)
-    print(resampled_image.GetSize())
-    print(resampled_image.GetSpacing())
-    print(resampled_image.GetDirection())
-    print(resampled_image.GetOrigin())
+    print(resampled_image.GetSize(), image.GetSize())
+    print(resampled_image.GetSpacing(), image.GetSpacing())
+    print(resampled_image.GetDirection(), image.GetDirection())
+    print(resampled_image.GetOrigin(), image.GetOrigin())
     return resampled_image
     
 
