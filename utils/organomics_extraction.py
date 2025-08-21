@@ -46,6 +46,8 @@ def extract_organomics(root_dataset_path, output_directory):
         for modality_value, modality_name in channels.items():
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{str(modality_value).zfill(4)}.nii.gz")
             image = load_image(image_path)
+            print(spacing)
+            print(type(spacing))
             image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
