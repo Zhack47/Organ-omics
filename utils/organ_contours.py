@@ -24,6 +24,7 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
     roi_subset, labels, labels_map, task = config_total_seg(dastaset_json_path)
     if task not in ["total", "total_mr"]:
         roi_subset = None
+    print(ct_path)
     nii_seg = totalsegmentator(nib.load(ct_path), task=task, roi_subset=roi_subset,
                                skip_saving=True, **total_seg_kwargs)
     affine = nii_seg.affine
