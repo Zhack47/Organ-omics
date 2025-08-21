@@ -28,7 +28,7 @@ def load_names(root_path):
                                                                  should be {good_nb_images} images\
                                                                  but found {len(list_images)}"
     """
-    list_names = list(set([i.split(".nii.gz")[0][:-5] for i in list_labels]))
+    list_names = list(set([i.split(".nii.gz")[0][:-5] for i in list_images]))
     classes = dataset_json["labels"]
     return list_images, list_labels, list_names, channels, nb_channels, channel_ct, classes, spacing
 
