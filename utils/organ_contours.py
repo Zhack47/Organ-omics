@@ -45,7 +45,7 @@ def segment_dataset(root_dataset_path, output_directory):
         root_dataset_path (str): Path for the root of the dataset
         output_directory (str): Directory in which the organ segmentation will be stored
     """
-    _, _, names, _, _, ct_channel, _ = load_names(root_dataset_path)
+    _, _, names, _, _, ct_channel, _, _ = load_names(root_dataset_path)
     os.makedirs(output_directory, exist_ok=True)
     os.makedirs(join(output_directory, "labelsTr"), exist_ok=True)
     for name in names:
