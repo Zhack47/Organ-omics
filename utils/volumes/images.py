@@ -30,7 +30,7 @@ def resample_image(image, to):
     return resampled_image
 
 def resample_image_to_spacing(image, spacing):
-    new_size = tuple([l* round(j/i) for i, j, l in zip(spacing, image.GetSpacing(), image.GetSize())])
+    new_size = tuple([round(l* j/i) for i, j, l in zip(spacing, image.GetSpacing(), image.GetSize())])
     print(image.GetSize(), new_size)
     print(image.GetSpacing(), spacing)
     resampler = sitk.ResampleImageFilter()
