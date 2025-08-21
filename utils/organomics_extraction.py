@@ -46,15 +46,9 @@ def extract_organomics(root_dataset_path, output_directory):
         for modality_value, modality_name in channels.items():
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{str(modality_value).zfill(4)}.nii.gz")
             image = load_image(image_path)
-            print(spacing)
-            print(type(spacing))
             image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
-                print(mask.GetSize())
-                print(np.unique(sitk.GetArrayFromImage(mask), return_counts=True))
                 mask = resample_mask(mask, image)
-                print(mask.GetSize())
-                print(np.unique(sitk.GetArrayFromImage(mask), return_counts=True))
                 cropped_image, cropped_mask = crop_image_mask(image, mask, margin=(2,2,2))
                 re = Radiomics_Extractor(cropped_image, cropped_mask)
                 feature_vector = re.get_feature_vector()
