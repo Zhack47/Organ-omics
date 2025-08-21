@@ -5,6 +5,7 @@
         "0": "CT",
         "1": "PT"
     },
+    "spacing": [2,2,2],
     "task": "total",
     "labels":
     {

@@ -15,6 +15,7 @@ def load_names(root_path):
         dataset_json = json.load(json_file)
     
     channels = dataset_json["channel_names"]
+    spacing = dataset_json["spacing"]
     nb_channels = len(channels.keys())
     channel_ct = np.argwhere(np.array(list(dataset_json["channel_names"].values()))=="CT").squeeze()
     images_root_path = join(root_path, "imagesTr")
@@ -28,7 +29,7 @@ def load_names(root_path):
                                                                  but found {len(list_images)}"
     list_names = [i.split(".nii.gz")[0] for i in list_labels]
     classes = dataset_json["labels"]
-    return list_images, list_labels, list_names, channels, nb_channels, channel_ct, classes
+    return list_images, list_labels, list_names, channels, nb_channels, channel_ct, classes, spacing
 
 
 def config_total_seg(dastaset_json_path):

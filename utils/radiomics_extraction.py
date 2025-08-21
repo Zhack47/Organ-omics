@@ -5,7 +5,7 @@ import SimpleITK as sitk
 import numpy as np
 
 from utils.parse import load_names
-from utils.volumes.images import load_image
+from utils.volumes.images import load_image, resample_image_to_spacing
 from utils.radiomics.extraction import Radiomics_Extractor
 from utils.volumes.masks import load_mask, resample_mask, bb_sitk
 
@@ -27,7 +27,7 @@ def extract_radiomics(root_dataset_path, output_directory):
         root_dataset_path (str): path to the root of the nnUNet dataset
         output_directory (str): Output directory where the Organomics.csv file will be saved
     """
-    _, _, names, channels, _, _, classes = load_names(root_dataset_path)
+    _, _, names, channels, _, _, classes, spacing = load_names(root_dataset_path)
     del classes["background"]  # Remove the background from channels
     os.makedirs(output_directory, exist_ok=True)
     out_csv_file = open(join(output_directory, "Radiomics.csv"), "w", encoding="utf-8")
@@ -46,6 +46,7 @@ def extract_radiomics(root_dataset_path, output_directory):
         for modality_value, modality_name in channels.items():
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{str(modality_value).zfill(4)}.nii.gz")
             image = load_image(image_path)
+            image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
                 cropped_image, cropped_mask = crop_image_mask(image, mask, margin=(2,2,2))
