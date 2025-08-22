@@ -4,7 +4,7 @@ from tqdm import tqdm
 import SimpleITK as sitk
 import numpy as np
 
-from utils.parse import load_names
+from utils.parse import load_names, display_radiomics_config
 from utils.volumes.images import load_image, resample_image_to_spacing
 from utils.radiomics.extraction import Radiomics_Extractor
 from utils.volumes.masks import load_mask, resample_mask, bb_sitk
@@ -28,6 +28,7 @@ def extract_radiomics(root_dataset_path, output_directory):
         output_directory (str): Output directory where the Organomics.csv file will be saved
     """
     _, _, names, channels, _, _, classes, spacing = load_names(root_dataset_path)
+    display_radiomics_config(names, channels, classes, spacing)
     del classes["background"]  # Remove the background from channels
     os.makedirs(output_directory, exist_ok=True)
     out_csv_file = open(join(output_directory, "Radiomics.csv"), "w", encoding="utf-8")
@@ -70,7 +71,8 @@ def extract_radiomics(root_dataset_path, output_directory):
             suffix = str(modality_value).zfill(4)
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{suffix}.nii.gz")
             image = load_image(image_path)
-            image = resample_image_to_spacing(image, spacing)
+            if spacing is not None:
+                image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
                 mask_array = sitk.GetArrayFromImage(mask)

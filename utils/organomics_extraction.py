@@ -11,6 +11,18 @@ from utils.volumes.masks import load_mask, resample_mask, bb_sitk
 
 
 def crop_image_mask(image: sitk.Image, mask: sitk.Image, margin=(0, 0, 0)):
+    """Crops both the input mask and image to the bouding box of the nonzero values in the mask. 
+        A margin can be defined (default: 0 on all sides)to increase the bouning box.
+        However the margin cannot exceed the original size, in any direction.
+        If it does, the image border is kept as such in this direction.
+    Args:
+        image (SimpleITK.Image): _description_
+        mask (SimpleITK.Image): _description_
+        margin (tuple, optional): _description_. Defaults to (0, 0, 0).
+
+    Returns:
+        (tuple): A tuple containing the cropped image and the cropped mask.
+    """
     X, Y, Z = mask.GetSize()
     start_index_x, start_index_y, start_index_z, size_x, size_y, size_z =bb_sitk(mask)
     start =  [max(0, start_index_x - margin[2]), max(0, start_index_y - margin[1]), max(0, start_index_z - margin[0])]
@@ -71,7 +83,8 @@ def extract_organomics(root_dataset_path, output_directory):
             suffix = str(modality_value).zfill(4)
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{suffix}.nii.gz")
             image = load_image(image_path)
-            image = resample_image_to_spacing(image, spacing)
+            if spacing is not None:
+                image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
                 mask_array = sitk.GetArrayFromImage(mask)

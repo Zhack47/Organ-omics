@@ -1,6 +1,7 @@
 """ Module for JSON files parsing and nnUNet-format dataset handling"""
 import os
 import json
+import warnings
 from os.path import join
 import numpy as np
 
@@ -13,9 +14,20 @@ def load_names(root_path):
     """
     with open(join(root_path, "dataset.json"), "rb") as json_file:
         dataset_json = json.load(json_file)
+    # Get spacing for resampling
+    try:
+        spacing = dataset_json["spacing"]
+        if len(spacing) != 3:
+            spacing = None
+            raise ValueError("Wrong spacing format!")
+        if len(set(spacing))!=1:
+            warnings.warn("Anisotropic spacing detected! This breaks the IBSI standard.")
+    except (KeyError, ValueError) as e:
+        if isinstance(e, ValueError) and str(e) != "Wrong spacing format!":
+            raise e
+        spacing = None
     
     channels = dataset_json["channel_names"]
-    spacing = dataset_json["spacing"]
     nb_channels = len(channels.keys())
     channel_ct = np.argwhere(np.array(list(dataset_json["channel_names"].values()))=="CT").squeeze()
     images_root_path = join(root_path, "imagesTr")
@@ -44,7 +56,8 @@ def config_total_seg(dastaset_json_path):
         dastaset_json_path (str): Path to the dataset.json file
 
     Returns:
-        list, dict, dict: List of organs, organ groups and their label number, organ groups and the corresponding organs 
+        list, dict, dict: List of organs, organ groups and their label number, organ groups
+          and the corresponding organs 
     """
     with open(dastaset_json_path, "rb") as json_file:
         json_object = json.load(json_file)
@@ -60,6 +73,25 @@ def config_total_seg(dastaset_json_path):
             organs_to_extract.append(label)
     return organs_to_extract, labels_dict, correspondance, task
 
+def display_radiomics_config(names, channels, classes, spacing):
+    """Displays a summary of the configuration which will be used
+      to extract radiomic features.
+
+    Args:
+        names (_type_): List of the patient names present in the dataset
+        channels (_type_): List of channels (imaging modalities), available for each patient
+        classes (_type_): List of segmentation classes (ROIs)
+        spacing (_type_): Target common spacing. Can be None if no spacing
+          has been specified, but this breaks IBSI copliance
+    """
+    res = f"We found {len(names)} patients, with {len(channels)} channels each.\n"
+    res += f"The segmentation classes are {classes}"
+    if spacing is None:
+        res+= "No spacing was provided for rsampling, keeping original spacing (Warning: this breaks ISI standard)"
+    else:
+        res+=f"Volumes will be resampled to a {spacing} spacing."
+    print(res)
+
 
 if __name__ == "__main__":
-    images, labels, names, ct_channel = load_names("../data/Dataset001_Test")
+    images_, labels_, names_, channels_, nb_channels_, channel_ct_, classes_, spacing_ = load_names("../data/Dataset001_Test")
