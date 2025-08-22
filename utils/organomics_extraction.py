@@ -33,7 +33,8 @@ def extract_organomics(root_dataset_path, output_directory):
     out_csv_file = open(join(output_directory, "Organomics.csv"), "w", encoding="utf-8")
 
 
-    # Write columns headers
+    # We do a first blank pass in order to write the columns' names
+    # Maybe we could do thiss diifferently?
     out_csv_file.write("Patient_ID")
     feature_names = set()
     for name in names[:1]:
@@ -70,6 +71,7 @@ def extract_organomics(root_dataset_path, output_directory):
             suffix = str(modality_value).zfill(4)
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{suffix}.nii.gz")
             image = load_image(image_path)
+            image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
                 mask_array = sitk.GetArrayFromImage(mask)

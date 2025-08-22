@@ -47,3 +47,11 @@ Once the organ segmentation have ben extracted and are placed in the `labelsTr` 
 To compare organomics and radiomics performance, wealso developped an automated radiomics extraction pipeline. To run this pipeline, you need a dataset structured as defined above, with lesion segmentatins placed in the labelsTs folder. Run it with the following command:
 
 ```python3 extract_radiomics -d <dataset_path> -o <csv_file_radiomics_output_path>```
+
+## Results on the HECKTOR22 dataset
+
+![Performance using Organomics for survival estimation](data/imgs/Organomics_performance.png)
+Performance obtained using Organomics for survival estimation
+
+![Performance using Radiomics for survival estimation](data/imgs/Radiomics_performance.png)
+Performance obtained using Radiomics for survival estimation

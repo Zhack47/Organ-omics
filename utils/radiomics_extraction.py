@@ -70,6 +70,7 @@ def extract_radiomics(root_dataset_path, output_directory):
             suffix = str(modality_value).zfill(4)
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{suffix}.nii.gz")
             image = load_image(image_path)
+            image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
                 mask = resample_mask(mask, image)
                 mask_array = sitk.GetArrayFromImage(mask)

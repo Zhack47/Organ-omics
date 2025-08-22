@@ -6,7 +6,7 @@ import numpy as np
 
 
 def load_names(root_path):
-    """ Load names and images/labels paths from a nnUNet formatted dataset
+    """ Load names and images/labels paths from a nnUNet formated dataset
 
     Args:
         root_path (str): root of the nnUNet dataset
@@ -24,10 +24,14 @@ def load_names(root_path):
     list_images = os.listdir(images_root_path)
     list_labels = os.listdir(labels_root_path)
     good_nb_images = nb_channels*len(list_labels)
-    """assert len(list_images) == nb_channels * len(list_labels), f"Found {len(list_labels)} labels,\
+
+    # Only check for consistency if labels are present.
+    # We want to be able to handle the case where no labels are present
+    # e.g. before organs are contoured using TotalSeg
+    if len(list_labels):
+        assert len(list_images) == nb_channels * len(list_labels), f"Found {len(list_labels)} labels,\
                                                                  should be {good_nb_images} images\
                                                                  but found {len(list_images)}"
-    """
     list_names = list(set([i.split(".nii.gz")[0][:-5] for i in list_images]))
     classes = dataset_json["labels"]
     return list_images, list_labels, list_names, channels, nb_channels, channel_ct, classes, spacing
