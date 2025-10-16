@@ -142,12 +142,11 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
                 scaler = StandardScaler()
                 X_train_local = scaler.fit_transform(X_train_local)
                 X_test_local = scaler.transform(X_test_local)
-                
+
                 for i in range(4):  # Number of repetitions
                     # Model training and scoring
                     model.fit(X_train_local, Y_train)
                     y_hat_train = model.predict(X_train_local)
-                    model.coef_*=-1
                     y_hat_test = model.predict(X_test_local)
                     # Concordance Index
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)

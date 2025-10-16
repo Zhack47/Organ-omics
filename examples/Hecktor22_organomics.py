@@ -131,7 +131,6 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                 for i in range(4):
                     model.fit(X_train_local, Y_train)
                     y_hat_train = model.predict(X_train_local)
-                    model.coef_*=-1
                     y_hat_test = model.predict(X_test_local)
                     ci_train = concordance_index_censored(Y_train["event"], Y_train["time"], y_hat_train)
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
