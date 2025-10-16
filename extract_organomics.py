@@ -3,7 +3,7 @@
 if __name__ == "__main__":
     import sys
     from argparse import ArgumentParser
-    from utils.radiomics import extract_radiomics
+    from utils.radiomics.extraction import extract_radiomics
 
 
     arg_parser = ArgumentParser()
