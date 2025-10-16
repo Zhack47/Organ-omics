@@ -106,10 +106,6 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
             X_test = X_test.fillna(0)
             del X_train["Patient_ID"]
             del X_test["Patient_ID"]
-
-            scaler = StandardScaler()
-            X_train = scaler.fit_transform(X_train)
-            X_test = scaler.transform(X_test)
             
 
             for thresh in tqdm(thresh_range):
@@ -126,6 +122,10 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                 avg_ci = 0.
                 avg_cdauc = 0.
                 print(X_train.shape)
+
+                scaler = StandardScaler()
+                X_train = scaler.fit_transform(X_train)
+                X_test = scaler.transform(X_test)
                 for i in range(4):
                     model.fit(X_train, Y_train)
                     y_hat_train = model.predict(X_train)
