@@ -15,5 +15,4 @@ if __name__ == "__main__":
     print(arguments.d)
     print(arguments.o)
     print(arguments)
-    exit()
-    extract_radiomics(arguments.d, arguments.o, arguments.json)
+    extract_radiomics(arguments.d, arguments.o, arguments.json_file_name)
