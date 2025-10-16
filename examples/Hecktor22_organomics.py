@@ -90,9 +90,6 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
             X_train = organomics[organomics["Patient_ID"].isin(train_ids)]
             X_test = organomics[organomics["Patient_ID"].isin(test_ids)]
             
-            scaler = StandardScaler()
-            X_train = scaler.fit_transform(X_train)
-            X_test = scaler.transform(X_test)
             
             Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
                                         endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
@@ -109,6 +106,11 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
             X_test = X_test.fillna(0)
             del X_train["Patient_ID"]
             del X_test["Patient_ID"]
+
+            scaler = StandardScaler()
+            X_train = scaler.fit_transform(X_train)
+            X_test = scaler.transform(X_test)
+            
 
             for thresh in tqdm(thresh_range):
                 # Feature selection
