@@ -43,8 +43,8 @@ def extract_radiomics(root_dataset_path, output_filename, json_file_name):
     display_radiomics_config(names, channels, classes, spacing)
     del classes["background"]  # Remove the background from channels
     print(output_filename.split(os.sep)[:-1])
-    print(join(**output_filename.split(os.sep)[:-1]))
-    os.makedirs(join(**output_filename.split(os.sep)[:-1]), exist_ok=True)
+    print(join(*output_filename.split(os.sep)[:-1]))
+    os.makedirs(join(*output_filename.split(os.sep)[:-1]), exist_ok=True)
     out_csv_file = open(output_filename, "w", encoding="utf-8")
 
 
