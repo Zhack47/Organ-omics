@@ -109,6 +109,8 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
             
 
             for thresh in tqdm(thresh_range):
+                X_train_local = copy.deepcopy(X_train)
+                X_test_local = copy.deepcopy(X_test)
                 # Feature selection
                 for col in X_train.columns:
                     fs_model = CoxnetSurvivalAnalysis()
@@ -116,20 +118,20 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                     corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
                                                                 fs_model.predict(X_train[col].values.reshape(-1, 1)))
                     if corr_score[0] < thresh:
-                        del X_train[col]
-                        del X_test[col]
+                        del X_train_local[col]
+                        del X_test_local[col]
 
                 avg_ci = 0.
                 avg_cdauc = 0.
-                print(X_train.shape)
+                print(X_train_local.shape)
 
                 scaler = StandardScaler()
-                X_train = scaler.fit_transform(X_train)
-                X_test = scaler.transform(X_test)
+                X_train_np = scaler.fit_transform(X_train_local)
+                X_test_np = scaler.transform(X_test_local)
                 for i in range(4):
-                    model.fit(X_train, Y_train)
-                    y_hat_train = model.predict(X_train)
-                    y_hat_test = model.predict(X_test)
+                    model.fit(X_train_np, Y_train)
+                    y_hat_train = model.predict(X_train_np)
+                    y_hat_test = model.predict(X_test_np)
                     ci_train = concordance_index_censored(Y_train["event"], Y_train["time"], y_hat_train)
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
                     print(ci_train, ci)
