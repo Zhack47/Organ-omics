@@ -11,6 +11,7 @@ from sksurv.ensemble import RandomSurvivalForest
 from sksurv.metrics import concordance_index_censored, cumulative_dynamic_auc
 from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler
 from icare.survival import BaggedIcareSurvival
 
 
@@ -125,22 +126,29 @@ with open("../data/csvs/Radiomics_performance.csv", "w") as csvfile:
 
             for thresh in tqdm(thresh_range):
                 # Feature selection
+                X_train_local = copy.deepcopy(X_train)
+                X_test_local = copy.deepcopy(X_test)
                 for col in X_train.columns:
                     fs_model = CoxnetSurvivalAnalysis()
                     fs_model.fit(X_train[col].values.reshape(-1, 1), Y_train)
                     corr_score = concordance_index_censored(Y_train["event"], Y_train["time"],
                                                                 fs_model.predict(X_train[col].values.reshape(-1, 1)))
                     if corr_score[0] < thresh:
-                        del X_train[col]
-                        del X_test[col]
+                        del X_train_local[col]
+                        del X_test_local[col]
 
                 avg_ci = 0.
                 avg_cdauc = 0.
+                scaler = StandardScaler()
+                X_train_local = scaler.fit_transform(X_train_local)
+                X_test_local = scaler.transform(X_test_local)
+                
                 for i in range(4):  # Number of repetitions
                     # Model training and scoring
-                    model.fit(X_train, Y_train)
-                    y_hat_test = model.predict(X_test)
-                    y_hat_train = model.predict(X_train)
+                    model.fit(X_train_local, Y_train)
+                    y_hat_train = model.predict(X_train_local)
+                    model.coef_*=-1
+                    y_hat_test = model.predict(X_test_local)
                     # Concordance Index
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
                     # Cumulative-Dynamic AUC
