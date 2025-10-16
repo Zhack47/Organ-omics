@@ -125,9 +125,9 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                 avg_cdauc = 0.
                 print(X_train_local.shape)
 
-                #scaler = StandardScaler()
-                #X_train_local = scaler.fit_transform(X_train_local)
-                #X_test_local = scaler.transform(X_test_local)
+                scaler = StandardScaler()
+                X_train_local = scaler.fit_transform(X_train_local)
+                X_test_local = scaler.transform(X_test_local)
                 for i in range(4):
                     model.fit(X_train_local, Y_train)
                     y_hat_train = model.predict(X_train_local)
