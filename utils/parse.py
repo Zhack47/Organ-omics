@@ -6,7 +6,7 @@ from os.path import join
 import numpy as np
 
 
-def load_names(root_path):
+def load_names(root_path, json_file_name):
     """ Load names and images/labels paths from a nnUNet formated dataset
 
     Args:
@@ -85,11 +85,11 @@ def display_radiomics_config(names, channels, classes, spacing):
           has been specified, but this breaks IBSI copliance
     """
     res = f"We found {len(names)} patients, with {len(channels)} channels each.\n"
-    res += f"The segmentation classes are {classes}"
+    res += f"The segmentation classes are {classes}\n"
     if spacing is None:
-        res+= "No spacing was provided for rsampling, keeping original spacing (Warning: this breaks ISI standard)"
+        res+= "No spacing was provided for rsampling, keeping original spacing (Warning: this breaks ISI standard)\n"
     else:
-        res+=f"Volumes will be resampled to a {spacing} spacing."
+        res+=f"Volumes will be resampled to a {spacing} spacing.\n"
     print(res)
 
 

@@ -11,6 +11,18 @@ from utils.volumes.masks import load_mask, resample_mask, bb_sitk
 
 
 def crop_image_mask(image: sitk.Image, mask: sitk.Image, margin=(0, 0, 0)):
+    """Crops both the input mask and image to the bouding box of the nonzero values in the mask. 
+        A margin can be defined (default: 0 on all sides)to increase the bouning box.
+        However the margin cannot exceed the original size, in any direction.
+        If it does, the image border is kept as such in this direction.
+    Args:
+        image (SimpleITK.Image): _description_
+        mask (SimpleITK.Image): _description_
+        margin (tuple, optional): _description_. Defaults to (0, 0, 0).
+
+    Returns:
+        (tuple): A tuple containing the cropped image and the cropped mask.
+    """
     X, Y, Z = mask.GetSize()
     start_index_x, start_index_y, start_index_z, size_x, size_y, size_z =bb_sitk(mask)
     start =  [max(0, start_index_x - margin[2]), max(0, start_index_y - margin[1]), max(0, start_index_z - margin[0])]
@@ -20,21 +32,23 @@ def crop_image_mask(image: sitk.Image, mask: sitk.Image, margin=(0, 0, 0)):
     cropped_mask = sitk.RegionOfInterest(mask, size, start)
     return cropped_image, cropped_mask
 
-def extract_radiomics(root_dataset_path, output_directory):
+def extract_radiomics(root_dataset_path, output_filename, json_file_name):
     """Extracts organ radiomics for a whole nnUNet dataset
 
     Args:
         root_dataset_path (str): path to the root of the nnUNet dataset
         output_directory (str): Output directory where the Organomics.csv file will be saved
     """
-    _, _, names, channels, _, _, classes, spacing = load_names(root_dataset_path)
+    _, _, names, channels, _, _, classes, spacing = load_names(root_dataset_path, json_file_name=json_file_name)
     display_radiomics_config(names, channels, classes, spacing)
     del classes["background"]  # Remove the background from channels
-    os.makedirs(output_directory, exist_ok=True)
-    out_csv_file = open(join(output_directory, "Radiomics.csv"), "w", encoding="utf-8")
+    os.makedirs(join(output_filename.split(os.sep)[:-1]), exist_ok=True)
+    out_csv_file = open(output_filename, "w", encoding="utf-8")
 
 
     # Write columns headers
+    # We do a first blank pass in order to write the columns' names
+    # Maybe we could do thiss diifferently?
     out_csv_file.write("Patient_ID")
     feature_names = set()
     for name in names[:1]:
