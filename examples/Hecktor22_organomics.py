@@ -18,7 +18,7 @@ from sklearn.model_selection import StratifiedKFold
 def get_duplicates(dataframe):
     columns_to_remove = []
     list_columns = copy.deepcopy(dataframe.columns)
-    i = 1
+    i = 1 
     for column1 in list_columns:
         for column2 in list_columns[i:]:
             if dataframe[column1].equals(dataframe[column2]):
@@ -121,8 +121,11 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                 avg_cdauc = 0.
                 for i in range(4):
                     model.fit(X_train, Y_train)
+                    y_hat_train = model.predict(X_train)
                     y_hat_test = model.predict(X_test)
+                    ci_train = concordance_index_censored(Y_train["event"], Y_train["time"], y_hat_train)
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
+                    print(ci_train, ci)
                     time_points = np.arange(Y_test["time"][np.argpartition(Y_test["time"],5)[5]],
                                                     Y_test["time"][np.argpartition(Y_test["time"],-5)[-5]], 50)
                     cd_auc = cumulative_dynamic_auc(Y_train, Y_test, y_hat_test, times=time_points)
