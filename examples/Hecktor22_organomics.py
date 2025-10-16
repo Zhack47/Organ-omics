@@ -125,13 +125,13 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
                 avg_cdauc = 0.
                 print(X_train_local.shape)
 
-                scaler = StandardScaler()
-                X_train_np = scaler.fit_transform(X_train_local)
-                X_test_np = scaler.transform(X_test_local)
+                #scaler = StandardScaler()
+                #X_train_local = scaler.fit_transform(X_train_local)
+                #X_test_local = scaler.transform(X_test_local)
                 for i in range(4):
-                    model.fit(X_train_np, Y_train)
-                    y_hat_train = model.predict(X_train_np)
-                    y_hat_test = model.predict(X_test_np)
+                    model.fit(X_train_local, Y_train)
+                    y_hat_train = model.predict(X_train_local)
+                    y_hat_test = model.predict(X_test_local)
                     ci_train = concordance_index_censored(Y_train["event"], Y_train["time"], y_hat_train)
                     ci = concordance_index_censored(Y_test["event"], Y_test["time"], y_hat_test)
                     print(ci_train, ci)
