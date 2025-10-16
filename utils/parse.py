@@ -12,7 +12,7 @@ def load_names(root_path, json_file_name):
     Args:
         root_path (str): root of the nnUNet dataset
     """
-    with open(join(root_path, "dataset.json"), "rb") as json_file:
+    with open(json_file_name, "rb") as json_file:
         dataset_json = json.load(json_file)
     # Get spacing for resampling
     try:

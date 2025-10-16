@@ -15,11 +15,9 @@ from icare.visualisation import plot_avg_sign
 
 
 warnings.filterwarnings("ignore")
-organomics = pd.read_csv("../data/csvs/Organomics.csv", index_col="Patient_ID")
+organomics = pd.read_csv("../data/csvs/Radiomics.csv", index_col="Patient_ID")
 endpoints = pd.read_csv("../data/csvs/hecktor2022_endpoint_training.csv", index_col="PatientID")
 clinical = pd.read_csv("../data/csvs/hecktor2022_clinical_info_training.csv", index_col="PatientID")
-print(clinical)
-print(np.nanmedian(clinical["Weight"]))
 clinical["Weight"] = [np.nanmedian(clinical["Weight"]) if np.isnan(x) else x for x in clinical["Weight"]]
 clinical["Gender"] = [-1 if x == "M" else 1 for x in clinical["Gender"]]
 clinical["Tobacco"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["Tobacco"]]
@@ -27,11 +25,11 @@ clinical["Alcohol"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["
 clinical["Performance status"] = [-1 if np.isnan(x) else x for x in clinical["Performance status"]]
 clinical["Surgery"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["Surgery"]]
 clinical["HPV status (0=-, 1=+)"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["HPV status (0=-, 1=+)"]]
-print(clinical)
 print(organomics.shape)
+print(organomics.columns)
 print(clinical.shape)
 print(endpoints.shape)
-
+exit()
 df_train = pd.merge(organomics, endpoints, left_index=True, right_index=True)
 df_train = pd.merge(df_train, clinical, left_index=True, right_index=True)
 print(df_train.shape)
