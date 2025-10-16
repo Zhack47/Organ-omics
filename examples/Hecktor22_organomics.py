@@ -12,7 +12,7 @@ from sksurv.linear_model.coxnet import CoxnetSurvivalAnalysis
 from sksurv.ensemble import RandomSurvivalForest
 from icare.survival import BaggedIcareSurvival
 from sklearn.model_selection import StratifiedKFold
-
+from sklearn.preprocessing import StandardScaler
 
 
 def get_duplicates(dataframe):
@@ -89,7 +89,11 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
             test_ids = ids[ts_ids]
             X_train = organomics[organomics["Patient_ID"].isin(train_ids)]
             X_test = organomics[organomics["Patient_ID"].isin(test_ids)]
-
+            
+            scaler = StandardScaler()
+            X_train = scaler.fit_transform(X_train)
+            X_test = scaler.transform(X_test)
+            
             Y_train = Surv.from_arrays(endpoints[endpoints["PatientID"].isin(train_ids)]["Relapse"],
                                         endpoints[endpoints["PatientID"].isin(train_ids)]["RFS"])
 
@@ -119,6 +123,7 @@ with open("../data/csvs/Organomics_performance.csv", "w") as csvfile:
 
                 avg_ci = 0.
                 avg_cdauc = 0.
+                print(X_train.shape)
                 for i in range(4):
                     model.fit(X_train, Y_train)
                     y_hat_train = model.predict(X_train)
