@@ -9,8 +9,9 @@ if __name__ == "__main__":
     arg_parser = ArgumentParser()
     arg_parser.add_argument("-d", type=str)
     arg_parser.add_argument("-o", type=str)
+    arg_parser.add_argument("--json-file-name", type=str, required=False, default="dataset.json")
 
     arguments = arg_parser.parse_args(sys.argv[1:])
     print(arguments.d)
     print(arguments.o)
-    segment_dataset(arguments.d, arguments.o)
+    segment_dataset(arguments.d, arguments.o, arguments.json_file_name)
