@@ -4,7 +4,7 @@ from tqdm import tqdm
 import SimpleITK as sitk
 import numpy as np
 
-from utils.parse import load_names, display_radiomics_config
+from utils.parse import load_cases, display_radiomics_config
 from utils.volumes.images import load_image, resample_image_to_spacing
 from utils.radiomics.extraction import Radiomics_Extractor
 from utils.volumes.masks import load_mask, resample_mask, bb_sitk
@@ -39,7 +39,7 @@ def extract_radiomics(root_dataset_path, output_filename, json_file_name):
         root_dataset_path (str): path to the root of the nnUNet dataset
         output_directory (str): Output directory where the Organomics.csv file will be saved
     """
-    _, _, names, channels, _, _, classes, spacing = load_names(root_dataset_path, json_file_name=json_file_name)
+    _, _, names, channels, _, _, classes, spacing = load_cases(root_dataset_path, json_file_name=json_file_name)
     display_radiomics_config(names, channels, classes, spacing)
     del classes["background"]  # Remove the background from channels
 

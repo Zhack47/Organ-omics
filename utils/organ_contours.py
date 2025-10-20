@@ -8,7 +8,7 @@ from os.path import join
 import nibabel as nib
 from totalsegmentator.python_api import totalsegmentator, class_map
 
-from utils.parse import config_total_seg, load_names
+from utils.parse import config_total_seg, load_cases
 
 
 def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kwargs):
@@ -52,7 +52,7 @@ def segment_dataset(root_dataset_path, output_directory, dataset_json_filename):
         root_dataset_path (str): Path for the root of the dataset
         output_directory (str): Directory in which the organ segmentation will be stored
     """
-    _, _, names, _, _, ct_channel, _, _ = load_names(root_dataset_path,
+    _, _, names, _, _, ct_channel, _, _ = load_cases(root_dataset_path,
                                                      dataset_json_filename)
     os.makedirs(output_directory, exist_ok=True)
     os.makedirs(join(output_directory, "labelsTr"), exist_ok=True)

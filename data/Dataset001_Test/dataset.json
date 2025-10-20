@@ -6,7 +6,7 @@
         "1": "PT"
     },
     "spacing": [2,2,2],
-    "task": "total",
+    
     "labels":
     {
         "background": "0",
@@ -14,13 +14,18 @@
         "lungs": "2",
         "thoracic vertebrae": "3"
     },
-    "correspondance":
-    {
-        "heart": ["heart"],
-        "lungs": ["lung_upper_lobe_left", "lung_lower_lobe_left", "lung_upper_lobe_right",
-                  "lung_middle_lobe_right", "lung_lower_lobe_right"],
-        "thoracic vertebrae": ["vertebrae_T1","vertebrae_T2","vertebrae_T3","vertebrae_T4",
-                               "vertebrae_T5","vertebrae_T6","vertebrae_T7","vertebrae_T8",
-                               "vertebrae_T9","vertebrae_T10","vertebrae_T11","vertebrae_T12"]
-    }
+    "tasks":[
+         {
+            "name": "total",
+            "correspondance":
+                {
+                    "heart": ["heart"],
+                    "lungs": ["lung_upper_lobe_left", "lung_lower_lobe_left", "lung_upper_lobe_right",
+                            "lung_middle_lobe_right", "lung_lower_lobe_right"],
+                    "thoracic vertebrae": ["vertebrae_T1","vertebrae_T2","vertebrae_T3","vertebrae_T4",
+                                        "vertebrae_T5","vertebrae_T6","vertebrae_T7","vertebrae_T8",
+                                        "vertebrae_T9","vertebrae_T10","vertebrae_T11","vertebrae_T12"]
+                }
+            }
+        ]
 }
