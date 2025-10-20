@@ -1,7 +1,7 @@
 ## Inspired from https://github.com/Lrebaud/ICARE/blob/main/notebook/reproducing_HECKTOR2022.ipynb
 
 import numpy as np
-
+import copy
 import warnings
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,15 +9,20 @@ from sksurv.util import Surv
 from sksurv.metrics import concordance_index_censored, cumulative_dynamic_auc
 from scipy.stats import spearmanr, pearsonr
 from sklearn.model_selection import StratifiedKFold
-
+from sksurv.svm import FastSurvivalSVM
+from sksurv.linear_model import CoxnetSurvivalAnalysis
 from icare.survival import BaggedIcareSurvival
 from icare.visualisation import plot_avg_sign
+from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import SelectKBest
 
 
 warnings.filterwarnings("ignore")
-organomics = pd.read_csv("../data/csvs/Radiomics.csv", index_col="Patient_ID")
+organomics = pd.read_csv("../data/csvs/Organomics.csv", index_col="Patient_ID")
+radiomics = pd.read_csv("../data/csvs/Radiomics.csv", index_col="Patient_ID")
 endpoints = pd.read_csv("../data/csvs/hecktor2022_endpoint_training.csv", index_col="PatientID")
 clinical = pd.read_csv("../data/csvs/hecktor2022_clinical_info_training.csv", index_col="PatientID")
+
 clinical["Weight"] = [np.nanmedian(clinical["Weight"]) if np.isnan(x) else x for x in clinical["Weight"]]
 clinical["Gender"] = [-1 if x == "M" else 1 for x in clinical["Gender"]]
 clinical["Tobacco"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["Tobacco"]]
@@ -25,100 +30,56 @@ clinical["Alcohol"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["
 clinical["Performance status"] = [-1 if np.isnan(x) else x for x in clinical["Performance status"]]
 clinical["Surgery"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["Surgery"]]
 clinical["HPV status (0=-, 1=+)"] = [1 if x == 1. else -1 if x ==0. else 0 for x in clinical["HPV status (0=-, 1=+)"]]
-print(organomics.shape)
-print(organomics.columns)
-print(clinical.shape)
-print(endpoints.shape)
-exit()
-df_train = pd.merge(organomics, endpoints, left_index=True, right_index=True)
+
+#df_train = pd.merge(organomics, radiomics, left_index=True, right_index=True)
+#df_train = organomics
+df_train = radiomics
+df_train = pd.merge(df_train, endpoints, left_index=True, right_index=True)
 df_train = pd.merge(df_train, clinical, left_index=True, right_index=True)
 print(df_train.shape)
+
 #####
-
-features = list(set(df_train.columns.tolist()) - set(['Relapse', 'RFS', 'Task 1', 'Task 2', 'CenterID']))
-#features = [x for x in features if 'lesions_merged' not in x and 'lymphnodes_merged' not in x]
-extra_features = ['Gender',
-                  'Age',
-                  'Weight',
-                  'Tobacco',
-                  'Alcohol',
-                  'Performance status',
-                  'HPV status (0=-, 1=+)',
-                  'Surgery',
-                  'Chemotherapy',
-                  #'nb_lesions',
-                  #'nb_lymphnodes',
-                  #'whole_body_scan'
-                  ]
-
-
-features_groups = list(map(str, np.unique(["_".join(x.split('_')[:-2]) for x in features])))
-features_groups = list(set(features_groups) - set(extra_features))
-# features_groups = [x + '_' for x in features_groups]
-features_groups.append('extra_features')
-print(len(features_groups), features_groups)
-
-####
 
 y_train = Surv.from_arrays(event=df_train['Relapse'].values,
                            time=df_train['RFS'].values)
-#X_train, X_test = df_train[features], df_test[features]
-kfold = StratifiedKFold(5, random_state=np.random.randint(0, 100000000), shuffle=True)
+kfold = StratifiedKFold(5, random_state=np.random.randint(0, 1e9), shuffle=True)
 
 
-####
-features_groups_id = []
-for f in df_train.columns:
-    if f in extra_features:
-        features_groups_id.append(features_groups.index('extra_features'))
-    else:
-        group = "_".join(f.split('_')[:-2])
-        features_groups_id.append(features_groups.index(group))
+def get_duplicates(dataframe):
+    columns_to_remove = []
+    list_columns = copy.deepcopy(dataframe.columns)
+    i = 1 
+    for column1 in list_columns:
+        for column2 in list_columns[i:]:
+            if dataframe[column1].equals(dataframe[column2]):
+                columns_to_remove.append(column1)
+                break
+        i+=1
+    return columns_to_remove
 
-
-####
-
-hyperparameters_sets = [
- {'rho': 0.66,
-  'cmin': 0.53,
-  'max_features': 0.00823045267489712,
-  'mandatory_features': extra_features,
-  'sign_method': 'harrell',
-  'features_groups_to_use': [2, 4, 8, 10]},
- {'rho': 0.72,
-  'cmin': 0.59,
-  'max_features': 0.009465020576131687,
-  'mandatory_features': extra_features,
-  'sign_method': 'harrell',
-  'features_groups_to_use': [3, 4, 10, 11, 12]},
- {'rho': 0.87,
-  'cmin': 0.55,
-  'max_features': 0.06131687242798354,
-  'mandatory_features': extra_features,
-  'sign_method': 'harrell',
-  'features_groups_to_use': [1, 3, 4, 10, 11, 12]},
- {'rho': 0.57,
-  'cmin': 0.51,
-  'max_features': 0.005761316872427984,
-  'mandatory_features': extra_features,
-  'sign_method': 'harrell',
-  'features_groups_to_use': [0, 2, 5, 6, 9, 11, 12]},
- {'rho': 0.71,
-  'cmin': 0.57,
-  'max_features': 0.16131687242798354,
-  'mandatory_features': extra_features,
-  'sign_method': 'harrell',
-  'features_groups_to_use': [4, 8, 12]}
-]
+print(df_train.shape)
+# Removing duplicate columns
+#duplicate_columns = get_duplicates(df_train)
+#for c in duplicate_columns:
+#    if c not in ["RFS", "Relapse", "Patient ID"]:
+#        del df_train[c]
+#print(df_train.shape)
 
 ####
-
+df_train
+df_train = df_train.fillna(0)
 censored = df_train["Relapse"]
 ids = df_train.index
+ci_avg_train = 0.
+ci_avg_test = 0.
+cdauc_avg_train=0.
+cdauc_avg_test=0.
 for tr_ids, ts_ids in kfold.split(ids, censored):
     print("###############################################")
+
     train_ids = ids[tr_ids]
     test_ids = ids[ts_ids]
+    scaler = StandardScaler()
     X_train_local = df_train[df_train.index.isin(train_ids)]
     X_test_local = df_train[df_train.index.isin(test_ids)]
     Y_train_local = Surv.from_arrays(df_train[df_train.index.isin(train_ids)]["Relapse"],
@@ -126,19 +87,73 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
     Y_test_local = Surv.from_arrays(df_train[df_train.index.isin(test_ids)]["Relapse"],
                                         df_train[df_train.index.isin(test_ids)]["RFS"])
 
+
+    banned_features = ["RFS", "Relapse", "Task 1", "Task 2", "CenterID"]
+    for banned_feature in banned_features:
+        try:
+            del X_train_local[banned_feature]
+            del X_test_local[banned_feature]
+        except KeyError:
+            pass
+    
+    def f_uci(X,Y):
+        Y = Surv.from_arrays(event=[x[0] for x in Y], time=[x[1] for x in Y])
+        scores = []
+        pvals = []
+        for col_nb in range(X.shape[1]):
+            fs_model = CoxnetSurvivalAnalysis()
+            fs_model.fit(X[:,col_nb].reshape(-1, 1), Y)
+            corr_score = concordance_index_censored(Y["event"], Y["time"],
+                                                        fs_model.predict(X[:, col_nb].reshape(-1, 1)))
+            scores.append(corr_score[0])
+            pvals.append(1/corr_score[0])
+        return scores, scores
+    
+    selector = SelectKBest(score_func=f_uci, k=200)
+    X_train_selected = selector.fit(X_train_local.values, Y_train_local)
+    X_train_selected = selector.transform(X_train_local)
+    X_test_selected = selector.transform(X_test_local)
+
+    selected_features = X_train_local.columns[selector.get_support()]
+    f_scores = selector.scores_[selector.get_support()]
+    #print(f"Selected Features: {selected_features}")
+    #print(f"F-Scores: {f_scores}")
+    X_train_local = X_train_local[selected_features]
+    X_test_local = X_test_local[selected_features]
+    
+    
+    X_train_local_np = scaler.fit_transform(X_train_local)
+    X_test_local_np = scaler.transform(X_test_local)
+
     model = BaggedIcareSurvival(n_estimators=100,
-                                parameters_sets=None,  # hyperparameters_sets,
+                                parameters_sets=None,
                                 aggregation_method='median',
                                 n_jobs=-1)
-
-    model.fit(X_train_local, Y_train_local) # , feature_groups=features_groups_id)
+    #model = FastSurvivalSVM()
+    model.fit(X_train_local, Y_train_local)
     train_pred = model.predict(X_train_local)
     test_pred = model.predict(X_test_local)
-    #print(train_pred)
-    #test_pred = model.predict(X_test)
 
-    print(concordance_index_censored(Y_train_local["event"], Y_train_local["time"], train_pred))
-    print(concordance_index_censored(Y_test_local["event"], Y_test_local["time"], test_pred))
+    # C-Index
+    ci_train = concordance_index_censored(Y_train_local["event"], Y_train_local["time"], train_pred)
+    ci_test = concordance_index_censored(Y_test_local["event"], Y_test_local["time"], test_pred)
+    ci_avg_train+=ci_train[0]
+    ci_avg_test+=ci_test[0]
+    print(ci_train[0], ci_test[0])
+    
+    # cdAUC
+    time_points_train = np.arange(Y_train_local["time"][np.argpartition(Y_train_local["time"],5)[5]],
+                                                    Y_train_local["time"][np.argpartition(Y_train_local["time"],-5)[-5]], 50)
+    time_points_test = np.arange(Y_test_local["time"][np.argpartition(Y_test_local["time"],5)[5]],
+                                                    Y_test_local["time"][np.argpartition(Y_test_local["time"],-5)[-5]], 50)
+    cdauc_train = cumulative_dynamic_auc(Y_train_local, Y_train_local, train_pred, times=time_points_train)[1]
+    cdauc_test = cumulative_dynamic_auc(Y_train_local, Y_test_local, test_pred, times=time_points_test)[1]
+    cdauc_avg_train+=cdauc_train
+    cdauc_avg_test+=cdauc_test
+    print(cdauc_train, cdauc_test)
+
     #spearmanr(train_pred, Y_train_local["time"])
     #plot_avg_sign(model, features=extra_features)
     #plt.show()
+print(f"Average train CI:{ci_avg_train/5}")
+print(f"Average test CI:{ci_avg_test/5}")
