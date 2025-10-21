@@ -20,10 +20,7 @@ for patient in tqdm(list_patients):
         studies_PT = os.listdir(join(root_dir, patient, "PT"))
     except:
         studies_PT = []
-    patient_studies = studies_CT + studies_PT
     num_studies = len(studies_CT)+len(studies_PT)
-    if num_studies!=2:  ## Found num_studies to only be 1 or 2 in the dataset
-        print(f"Found {num_studies} for patient {patient}.")
 
     if len(studies_PT)==1 and len(studies_CT)==1:
         patients_petct += 1
@@ -38,5 +35,7 @@ for patient in tqdm(list_patients):
                     ))
                     image = reader.Execute()
                     sitk.WriteImage(image, join(root_dir, patient, modality, study, f"{serie}.nii.gz"))'''
+    else:
+        print(f"Found {num_studies} for patient {patient}.")
 
 print(f"Patients OK PET/CT: {patients_petct}")
