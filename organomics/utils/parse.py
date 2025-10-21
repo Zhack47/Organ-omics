@@ -98,17 +98,6 @@ def config_total_seg(dastaset_json_path):
     return organs_to_extract, labels_dict, new_correspondance
 
 
-    ##########
-    task = json_object["task"]
-    labels_dict = json_object["labels"]
-    label_groups = list(labels_dict.keys())
-    correspondance = json_object["correspondance"]
-
-    for label_group in label_groups[1:]:  # 0 should be background (for compatibility with nnunet format)
-        for label in correspondance[label_group]:
-            organs_to_extract.append(label)
-    return organs_to_extract, labels_dict, correspondance, tasknames
-
 def display_radiomics_config(names, channels, classes, spacing):
     """Displays a summary of the configuration which will be used
       to extract radiomic features.
