@@ -23,11 +23,12 @@ for patient in tqdm(list_patients):
             for study in os.listdir(join(root_dir, patient, modality)):
                 series = os.listdir(join(root_dir, patient, modality, study))
                 for i, serie in enumerate(series):
-                    reader = sitk.ImageSeriesReader()
+                    pass
+                    '''reader = sitk.ImageSeriesReader()
                     reader.SetFileNames(reader.GetGDCMSeriesFileNames(
-                        join(root_dir, patient, study, serie)
+                        join(root_dir, patient, modality, study, serie)
                     ))
                     image = reader.Execute()
-                    sitk.WriteImage(image, join(root_dir, patient, modality, study, f"{serie}.nii.gz"))
+                    sitk.WriteImage(image, join(root_dir, patient, modality, study, f"{serie}.nii.gz"))'''
 
-print(f"Patients OK PET/CT: {patients_petct}")
+    print(f"Patients OK PET/CT: {patients_petct}")
