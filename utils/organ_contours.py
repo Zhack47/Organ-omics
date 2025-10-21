@@ -32,7 +32,6 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
             roi_subset = roi_subsets[task]
 
         # Performing organs segmentation and returning a nifti object (not saved as a file)
-        print(task, roi_subset, total_seg_kwargs)
         nii_seg = totalsegmentator(nib.load(ct_path), task=task, roi_subset=roi_subset,
                                 skip_saving=True, **total_seg_kwargs)
         affine = nii_seg.affine
@@ -48,11 +47,7 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
             for roi in labels_map[task][group_label]:
                 label = reverse_map[roi]
                 grouped_data[data==label]=int(labels[group_label])
-        print(np.unique(out))
-        print(out.shape, grouped_data.shape)
         out = np.where(out>0, out, grouped_data)
-        print(out.shape)
-        print(np.unique(out))
     new_nib_image = nib.Nifti1Image(out, affine=affine)
     nib.save(new_nib_image, output_fpath)
 
