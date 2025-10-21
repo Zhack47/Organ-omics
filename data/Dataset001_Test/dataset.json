@@ -13,8 +13,8 @@
         "heart": "1",
         "lungs": "2",
         "thoracic vertebrae": "3",
-        "pectoralis": "3",
-        "rectus": "3"
+        "pectoralis": "4",
+        "rectus": "5"
     },
     "tasks":[
          {
