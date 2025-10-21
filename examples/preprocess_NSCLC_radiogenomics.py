@@ -21,7 +21,7 @@ for patient in tqdm(list_patients):
     except:
         studies_PT = []
     patient_studies = studies_CT + studies_PT
-    num_studies = len(patient_studies)
+    num_studies = len(studies_CT)+len(studies_PT)
     if num_studies!=2:  ## Found num_studies to only be 1 or 2 in the dataset
         print(f"Found {num_studies} for patient {patient}.")
 
