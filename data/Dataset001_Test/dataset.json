@@ -12,7 +12,9 @@
         "background": "0",
         "heart": "1",
         "lungs": "2",
-        "thoracic vertebrae": "3"
+        "thoracic vertebrae": "3",
+        "pectoralis": "3",
+        "rectus": "3"
     },
     "tasks":[
          {
@@ -25,6 +27,13 @@
                     "thoracic vertebrae": ["vertebrae_T1","vertebrae_T2","vertebrae_T3","vertebrae_T4",
                                         "vertebrae_T5","vertebrae_T6","vertebrae_T7","vertebrae_T8",
                                         "vertebrae_T9","vertebrae_T10","vertebrae_T11","vertebrae_T12"]
+                }
+            },
+            {
+                "name": "abdominal_muscles",
+                "correspondance":{
+                    "pectoralis": ["pectoralis_major_right", "pectoralis_major_left"],
+                    "rectus": ["rectus_abdominis_right", "rectus_abdominis_left"]
                 }
             }
         ]
