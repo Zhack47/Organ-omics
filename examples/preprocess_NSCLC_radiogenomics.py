@@ -29,6 +29,9 @@ for patient in tqdm(list_patients):
             patient_studies = [patient_studies[values[0]],
                                patient_studies[values[1]]]
     if len(patient_studies)== 2:
-        print(f"Patient {patient} OK")
-        patients_petct += 1
+        print(f"Patient {patient} OK?")
+        print(patient_studies)
+        input_ = input("?")
+        if input_ == "":
+            patients_petct += 1
 print(f"Patients OK PET/CT: {patients_petct}")
