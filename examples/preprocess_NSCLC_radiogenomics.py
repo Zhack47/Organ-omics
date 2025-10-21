@@ -2,6 +2,7 @@ import os
 import sys
 from os.path import join
 from tqdm import tqdm
+import SimpleITK as sitk
 
 
 # Path to the root of the directory containing
@@ -13,25 +14,19 @@ list_patients = [x for x in os.listdir(root_dir) if x!="LICENSE"]
 for patient in tqdm(list_patients):
     patient_studies = os.listdir(join(root_dir, patient))
     num_studies = len(patient_studies)
-    if num_studies<2:
-        print(f"Found only {num_studies} for patient {patient}.")
-    elif num_studies>2:
+    if num_studies!=2:  ## Found num_studies to only be 1 or 2 in the dataset
         print(f"Found {num_studies} for patient {patient}.")
-        print("Select the ones you want to keep (format is 'x,y')(if none press 0):")
-        for i, study_name in enumerate(patient_studies):
-            print(f"({i+1}): {study_name}")
-        input_ = input("?")
-        if input_ == "0":
-            pass
-        else:
-            values = list(map(int, input_.split(",")))
-            assert len(values)==2
-            patient_studies = [patient_studies[values[0]],
-                               patient_studies[values[1]]]
+
     if len(patient_studies)== 2:
-        print(f"Patient {patient} OK?")
-        print(patient_studies)
-        input_ = input("?")
-        if input_ == "":
-            patients_petct += 1
+        patients_petct += 1
+        for study in patient_studies:
+            series = os.listdir(join(root_dir, study))
+            for i, serie in enumerate(series):
+                reader = sitk.ImageSeriesReader()
+                reader.SetFileNames(reader.GetGDCMSeriesFileNames(
+                    join(root_dir, study, serie)
+                ))
+                image = reader.Execute()
+                sitk.WriteImage(image, join(root_dir, patient, study, f"{serie}.nii.gz"))
+
 print(f"Patients OK PET/CT: {patients_petct}")
