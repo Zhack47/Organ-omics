@@ -12,7 +12,15 @@ root_dir = sys.argv[1]
 patients_petct = 0
 list_patients = [x for x in os.listdir(root_dir) if x!="LICENSE"]
 for patient in tqdm(list_patients):
-    patient_studies = os.listdir(join(root_dir, patient, "CT")) + os.listdir(join(root_dir, patient, "PT"))
+    try:
+        studies_CT = os.listdir(join(root_dir, patient, "CT"))
+    except:
+        studies_CT = None
+    try:
+        studies_PT = os.listdir(join(root_dir, patient, "PT"))
+    except:
+        studies_PT = None
+    patient_studies = studies_CT + studies_PT
     num_studies = len(patient_studies)
     if num_studies!=2:  ## Found num_studies to only be 1 or 2 in the dataset
         print(f"Found {num_studies} for patient {patient}.")
