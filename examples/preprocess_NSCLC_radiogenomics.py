@@ -30,6 +30,7 @@ for patient in tqdm(list_patients):
                 #for i, serie in enumerate(series):
                     #pass
                     reader = sitk.ImageSeriesReader()
+                    print(join(root_dir, patient, modality, study))
                     reader.SetFileNames(reader.GetGDCMSeriesFileNames(
                         join(root_dir, patient, modality, study)
                     ))
