@@ -88,7 +88,7 @@ def config_total_seg(dastaset_json_path):
         tasknames.append(task_name)
         correspondance = task["correspondance"]
         for group, labels_list in correspondance.items():
-            if group in labels_list:
+            if group in labels_dict.keys():
                 if group not in new_correspondance:
                     new_correspondance[task_name][group] = []
                 for single_label in labels_list:
