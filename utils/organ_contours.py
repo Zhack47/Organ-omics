@@ -48,7 +48,7 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
             for roi in labels_map[task][group_label]:
                 label = reverse_map[roi]
                 grouped_data[data==label]=int(labels[group_label])
-        out[grouped_data>0] = grouped_data
+        out = np.where(out[grouped_data>0], grouped_data, out)
     new_nib_image = nib.Nifti1Image(grouped_data, affine=affine)
     nib.save(new_nib_image, output_fpath)
 
