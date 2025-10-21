@@ -31,5 +31,4 @@ for patient in tqdm(list_patients):
     if len(patient_studies)== 2:
         print(f"Patient {patient} OK")
         patients_petct += 1
-        
-
+print(f"Patients OK PET/CT: {patients_petct}")

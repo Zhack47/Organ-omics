@@ -78,17 +78,31 @@ def config_total_seg(dastaset_json_path):
         json_object = json.load(json_file)
 
     tasknames = []
+    organs_to_extract = []
+    new_correspondance = {}
     tasks: list = json_object["tasks"]
+    labels_dict = json_object["labels"]
     for task in tasks:
-        tasknames.append(task["name"])
+        task_name = task["name"]
+        new_correspondance[task_name] = {}
+        tasknames.append(task_name)
         correspondance = task["correspondance"]
+        for group, labels_list in correspondance.items():
+            if group in labels_list:
+                if group not in new_correspondance:
+                    new_correspondance[task_name][group] = []
+                for single_label in labels_list:
+                    new_correspondance[task_name][group].append(single_label)
+                    organs_to_extract.append(single_label)
+    return organs_to_extract, labels_dict, new_correspondance
+
+
     ##########
     task = json_object["task"]
     labels_dict = json_object["labels"]
     label_groups = list(labels_dict.keys())
     correspondance = json_object["correspondance"]
 
-    organs_to_extract = []
     for label_group in label_groups[1:]:  # 0 should be background (for compatibility with nnunet format)
         for label in correspondance[label_group]:
             organs_to_extract.append(label)

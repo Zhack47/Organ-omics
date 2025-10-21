@@ -23,24 +23,29 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
     """
     
     # Extracting configuration from the dataset.json file
-    roi_subset, labels, labels_map, task = config_total_seg(dastaset_json_path)
-    if task not in ["total", "total_mr"]:  # roi_subset option is only available for the total and total_mr models
-        roi_subset = None
+    roi_subset, labels, labels_map = config_total_seg(dastaset_json_path)
+    tasks = labels_map.keys()
+    for task in tasks:
+        if task not in ["total", "total_mr"]:  # roi_subset option is only available for the total and total_mr models
+            roi_subset = None
 
-    # Performing organs segmentation and returning a nifti object (not saved as a file)
-    nii_seg = totalsegmentator(nib.load(ct_path), task=task, roi_subset=roi_subset,
-                               skip_saving=True, **total_seg_kwargs)
-    affine = nii_seg.affine
-    data = np.array(nii_seg.dataobj)
-
-    # Grouping organs as defined in dataset.json
-    grouped_data = np.zeros_like(data)
-    reverse_map = {v: k for k, v in class_map[task].items()}
-    for group_label in list(labels.keys())[1:]:
-        for roi in labels_map[group_label]:
-            label = reverse_map[roi]
-            grouped_data[data ==label]=int(labels[group_label])
-    
+        # Performing organs segmentation and returning a nifti object (not saved as a file)
+        nii_seg = totalsegmentator(nib.load(ct_path), task=task, roi_subset=roi_subset,
+                                skip_saving=True, **total_seg_kwargs)
+        affine = nii_seg.affine
+        data = np.array(nii_seg.dataobj)
+        try:
+            out
+        except NameError:
+            out = np.zeros_like(data)
+        # Grouping organs as defined in dataset.json
+        grouped_data = np.zeros_like(data)
+        reverse_map = {v: k for k, v in class_map[task].items()}
+        for group_label in list(labels.keys())[1:]:
+            for roi in labels_map[group_label]:
+                label = reverse_map[roi]
+                grouped_data[data==label]=int(labels[group_label])
+        out[grouped_data] = grouped_data
     new_nib_image = nib.Nifti1Image(grouped_data, affine=affine)
     nib.save(new_nib_image, output_fpath)
 
