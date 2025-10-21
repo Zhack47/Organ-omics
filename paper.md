@@ -85,5 +85,7 @@ To get the most from Organ-omics, the Field Of View (FOV) during acquisition sho
 
 
 # Real-World Example
-![Organs from 2 tasks: total and abdominal_muscles](images/Mixed_tasks_organ_contours.png)
+
+![Organs from 2 tasks: total and abdominal_muscles](./images/Mixed_tasks_organ_contours.png)
+
 **Figure 1**: This picture shows organs from two TS tasks: *heart*, *lung*(all lung lobes) and *thoracic vertebrae*(T1-T12) from the **total** task; *pectoralis major* (right and left grouped) and *rectus abdominis* (also right/left) from the task **abdominal_muscles**. This result is available to reproduce in [the examples](examples/paper_example.sh).
