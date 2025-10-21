@@ -25,7 +25,7 @@ for patient in tqdm(list_patients):
     if num_studies!=2:  ## Found num_studies to only be 1 or 2 in the dataset
         print(f"Found {num_studies} for patient {patient}.")
 
-    if studies_PT and studies_CT:
+    if len(studies_PT)==1 and len(studies_CT)==1:
         patients_petct += 1
         for modality in ("PT", "CT"):
             for study in os.listdir(join(root_dir, patient, modality)):
