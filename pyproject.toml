@@ -5,9 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "organomics"
 version = "0.0.1"
-dependencies = []
-requires-python = ">=3.11"
+dependencies = ["numpy",
+                "pyradiomics @ git+https://github.com/AIM-Harvard/pyradiomics.git",
+                "TotalSegmentator",
+                "nibabel"]
+requires-python = ">=3.12"
 authors = [
   {name = "Zacharia Mesbah", email = "mesbah.zacharia@sfr.fr"},
 ]
 readme = "README.md"
+[project.scripts]
+Organomics_contour_dataset = "contour_dataset:main"
+Organomics_extract_organomics = "extract_organomics:main"
+[tool.setuptools.package-dir]
+'' = "organomics"
