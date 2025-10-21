@@ -78,11 +78,12 @@ def config_total_seg(dastaset_json_path):
         json_object = json.load(json_file)
 
     tasknames = []
-    organs_to_extract = []
+    organs_to_extract = {}
     new_correspondance = {}
     tasks: list = json_object["tasks"]
     labels_dict = json_object["labels"]
     for task in tasks:
+        organs_to_extract[task["name"]] = []
         task_name = task["name"]
         new_correspondance[task_name] = {}
         tasknames.append(task_name)
@@ -93,7 +94,7 @@ def config_total_seg(dastaset_json_path):
                     new_correspondance[task_name][group] = []
                 for single_label in labels_list:
                     new_correspondance[task_name][group].append(single_label)
-                    organs_to_extract.append(single_label)
+                    organs_to_extract[task["name"]].append(single_label)
     return organs_to_extract, labels_dict, new_correspondance
 
 

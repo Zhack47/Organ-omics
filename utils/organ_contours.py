@@ -23,16 +23,16 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
     """
     
     # Extracting configuration from the dataset.json file
-    roi_subset, labels, labels_map = config_total_seg(dastaset_json_path)
-    print(roi_subset)
-    print(labels)
-    print(labels_map)
+    roi_subsets, labels, labels_map = config_total_seg(dastaset_json_path)
     tasks = labels_map.keys()
     for task in tasks:
         if task not in ["total", "total_mr"]:  # roi_subset option is only available for the total and total_mr models
             roi_subset = None
+        else:
+            roi_subset = roi_subsets[task]
 
         # Performing organs segmentation and returning a nifti object (not saved as a file)
+        print(task, roi_subset, total_seg_kwargs)
         nii_seg = totalsegmentator(nib.load(ct_path), task=task, roi_subset=roi_subset,
                                 skip_saving=True, **total_seg_kwargs)
         affine = nii_seg.affine
