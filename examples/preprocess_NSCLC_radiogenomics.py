@@ -39,4 +39,4 @@ for patient in tqdm(list_patients):
                     image = reader.Execute()
                     sitk.WriteImage(image, join(root_dir, patient, modality, study, f"{serie}.nii.gz"))'''
 
-    print(f"Patients OK PET/CT: {patients_petct}")
+print(f"Patients OK PET/CT: {patients_petct}")
