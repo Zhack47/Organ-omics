@@ -1,6 +1,7 @@
 import os
 import sys
 from os.path import join
+from tqdm import tqdm
 
 
 # Path to the root of the directory containing
