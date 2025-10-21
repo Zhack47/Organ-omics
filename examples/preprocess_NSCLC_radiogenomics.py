@@ -198,7 +198,8 @@ for patient in tqdm(list_patients):
                         image = reader.Execute()
                         image_suv = compute_suv(image, pydicom.dcmread(os.listdir(join(root_dir, patient, modality, study))[0]))
                         sitk.WriteImage(image, join(root_dir, patient, modality, f"{study}.nii.gz"))
-                    except:
+                    except Exception as e:
+                        print(e)
                         print(f"{join(root_dir, patient, modality, study)} failed.")
     else:
         print(f"Found {num_studies} for patient {patient}.")
