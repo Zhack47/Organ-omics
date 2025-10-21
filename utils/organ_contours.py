@@ -53,7 +53,7 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
         out = np.where(out>0, out, grouped_data)
         print(out.shape)
         print(np.unique(out))
-    new_nib_image = nib.Nifti1Image(grouped_data, affine=affine)
+    new_nib_image = nib.Nifti1Image(out, affine=affine)
     nib.save(new_nib_image, output_fpath)
 
 
