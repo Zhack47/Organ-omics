@@ -15,11 +15,11 @@ for patient in tqdm(list_patients):
     try:
         studies_CT = os.listdir(join(root_dir, patient, "CT"))
     except:
-        studies_CT = None
+        studies_CT = []
     try:
         studies_PT = os.listdir(join(root_dir, patient, "PT"))
     except:
-        studies_PT = None
+        studies_PT = []
     patient_studies = studies_CT + studies_PT
     num_studies = len(patient_studies)
     if num_studies!=2:  ## Found num_studies to only be 1 or 2 in the dataset
