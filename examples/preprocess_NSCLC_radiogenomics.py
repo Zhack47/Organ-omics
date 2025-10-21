@@ -12,15 +12,15 @@ root_dir = sys.argv[1]
 patients_petct = 0
 list_patients = [x for x in os.listdir(root_dir) if x!="LICENSE"]
 for patient in tqdm(list_patients):
-    patient_studies = os.listdir(join(root_dir, patient))
+    patient_studies = os.listdir(join(root_dir, patient, "CT")) + os.listdir(join(root_dir, patient, "PT"))
     num_studies = len(patient_studies)
     if num_studies!=2:  ## Found num_studies to only be 1 or 2 in the dataset
         print(f"Found {num_studies} for patient {patient}.")
 
     if len(patient_studies)== 2:
         patients_petct += 1
-        for study in patient_studies:
-            for modality in ("PT", "CT"):
+        for modality in ("PT", "CT"):
+            for study in os.listdir(join(root_dir, patient, modality)):
                 series = os.listdir(join(root_dir, patient, modality, study))
                 for i, serie in enumerate(series):
                     reader = sitk.ImageSeriesReader()
