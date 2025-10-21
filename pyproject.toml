@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "organomics"
+version = "0.0.1"
+dependencies = []
+requires-python = ">=3.11"
+authors = [
+  {name = "Zacharia Mesbah", email = "mesbah.zacharia@sfr.fr"},
+]
+readme = "README.md"
