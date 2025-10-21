@@ -22,7 +22,7 @@ for patient in tqdm(list_patients):
         studies_PT = []
     num_studies = len(studies_CT)+len(studies_PT)
 
-    if len(studies_PT)==1 and len(studies_CT)==1:
+    if studies_PT and studies_CT:
         patients_petct += 1
         for modality in ("PT", "CT"):
             for study in os.listdir(join(root_dir, patient, modality)):
