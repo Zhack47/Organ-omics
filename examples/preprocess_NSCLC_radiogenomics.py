@@ -26,15 +26,15 @@ for patient in tqdm(list_patients):
         patients_petct += 1
         for modality in ("PT", "CT"):
             for study in os.listdir(join(root_dir, patient, modality)):
-                series = os.listdir(join(root_dir, patient, modality, study))
-                for i, serie in enumerate(series):
-                    pass
+                #series = os.listdir(join(root_dir, patient, modality, study))
+                #for i, serie in enumerate(series):
+                    #pass
                     reader = sitk.ImageSeriesReader()
                     reader.SetFileNames(reader.GetGDCMSeriesFileNames(
-                        join(root_dir, patient, modality, study, serie)
+                        join(root_dir, patient, modality, study)
                     ))
                     image = reader.Execute()
-                    sitk.WriteImage(image, join(root_dir, patient, modality, study, f"{serie}.nii.gz"))
+                    sitk.WriteImage(image, join(root_dir, patient, modality, f"{study}.nii.gz"))
     else:
         print(f"Found {num_studies} for patient {patient}.")
 
