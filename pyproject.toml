@@ -9,7 +9,7 @@ dependencies = ["numpy",
                 "pyradiomics @ git+https://github.com/AIM-Harvard/pyradiomics.git",
                 "TotalSegmentator",
                 "nibabel"]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 authors = [
   {name = "Zacharia Mesbah", email = "mesbah.zacharia@sfr.fr"},
 ]
