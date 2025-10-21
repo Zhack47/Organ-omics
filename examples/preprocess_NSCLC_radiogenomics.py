@@ -20,13 +20,14 @@ for patient in tqdm(list_patients):
     if len(patient_studies)== 2:
         patients_petct += 1
         for study in patient_studies:
-            series = os.listdir(join(root_dir, patient, study))
-            for i, serie in enumerate(series):
-                reader = sitk.ImageSeriesReader()
-                reader.SetFileNames(reader.GetGDCMSeriesFileNames(
-                    join(root_dir, patient, study, serie)
-                ))
-                image = reader.Execute()
-                sitk.WriteImage(image, join(root_dir, patient, study, f"{serie}.nii.gz"))
+            for modality in ("PT", "CT"):
+                series = os.listdir(join(root_dir, patient, modality, study))
+                for i, serie in enumerate(series):
+                    reader = sitk.ImageSeriesReader()
+                    reader.SetFileNames(reader.GetGDCMSeriesFileNames(
+                        join(root_dir, patient, study, serie)
+                    ))
+                    image = reader.Execute()
+                    sitk.WriteImage(image, join(root_dir, patient, modality, study, f"{serie}.nii.gz"))
 
 print(f"Patients OK PET/CT: {patients_petct}")
