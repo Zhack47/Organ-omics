@@ -28,8 +28,8 @@ for patient in tqdm(list_patients):
             assert len(values)==2
             patient_studies = [patient_studies[values[0]],
                                patient_studies[values[1]]]
-    assert len(patient_studies)== 2
-    print(f"Patient {patient} OK")
-    patients_petct += 1
+    if len(patient_studies)== 2:
+        print(f"Patient {patient} OK")
+        patients_petct += 1
         
 
