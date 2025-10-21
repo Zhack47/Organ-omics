@@ -42,7 +42,7 @@ def segment_group_save(dastaset_json_path, ct_path, output_fpath, **total_seg_kw
         grouped_data = np.zeros_like(data)
         reverse_map = {v: k for k, v in class_map[task].items()}
         for group_label in list(labels.keys())[1:]:
-            for roi in labels_map[group_label]:
+            for roi in labels_map[task][group_label]:
                 label = reverse_map[roi]
                 grouped_data[data==label]=int(labels[group_label])
         out[grouped_data] = grouped_data
