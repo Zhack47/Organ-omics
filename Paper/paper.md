@@ -48,32 +48,42 @@ The pipeline then runs TS efficiently by limiting the organs to the necessary mi
 
 **Command:** `Organomics_contour_dataset -d [path_to_dataset] -o [path_to_labels_output] --json-file [path_to_JSON_file]`
 
-A second step computes the 107 organ-level radiomic features for each organ group using PyRadiomics and stores them in a single CSV file. This radiomics extraction can be configured to resample the data to a common isotropic spacing to comply with the IBSI standard.
+A second step computes the 107 organ-level radiomic features for each organ group using PyRadiomics and stores them in a single CSV file.
+
+This radiomics extraction can be configured to resample the data to a common isotropic spacing to comply with the IBSI standard.
+
 
 
 **Command:** `Organomics_extract_organomics -d [path_to_dataset] -o [path_to_csv_output] --json-file [path_to_JSON_file]`
 
 Organ-omics uses NIfTi at every step and can be integrated into larger preprocessing workflows or used as a standalone tool for organ radiomics studies.
 
-
 # Stopped Here
 
 ## Technical overview
 
 ### Key Features
- - **User-defined configuration**: Parse a user-defined configuration from a json file. Labels to extract and organ groups are defined in this file.
+  - **User-defined configuration**: parsing a user-defined JSON configuration file Organ-omics extracts:
+    - **Input channels**: one should be named *'CT'* and is used for organ contouring using TS, the remaining ones are stored for radiomics extraction since a set of organ radiomics is extracted per modality. 
+  
+    -  **Final labels**: names of all the organ groups (+ background which must be 0)
 
- - **Adaptive organ contours extraction**: Using the user-defined configuration, TS is used on the CT images efficiently (i.e.: when possible, the *roi_subset* parameter is defined to limit runtime). Still using this configuration, organs are gathered in groups and the final organ groups multi-label map is generated.
+    - **TotalSegmentator tasks**: each one is defined by its name and includes a dictionnary indicating how organs should be grouped.
+
+    - **Spacing**: To respect IBSI reccomendations, this should be an istropics spacing. If it is defined, images and masks will be resampled towards this spacing before radiomics are computed, applying third order BSpline interpolation for to images and Nearest Neighbour interpolation to masks.
+
+ - **Adaptive organ contours extraction**: Using the user-defined configuration, TS is used on the CT images efficiently (i.e.: when possible, the *roi_subset* parameter is defined to limit runtime).
  
-   
+   Organs are gathered in groups according to the user configuration and each organ group can contain one or more organs from a task. A set of organ group is defined for each task, but only organs from the same task can be included in the same group.
+
+   **The priority for labels follows the order of the *tasks* list.** If a label for an organ-group defined in the task at index 1 in the list is overlapping with a label originating from the task at index 0, the label from the task at index 0 will be kept.
+
+ - **Radiomic features extraction**: 107 radiomic features per Region Of Interest (ROI) are extracted using the PyRadiomics library.
  
- - **Radiomic features extraction**: 107 radiomic features per Region Of Interest (ROI) are extracted using the PyRadiomics library. Additional info is pulled from the configuration file to comply with the IBSI standard:
-   -  *Isotropic spacing*: it is possible not to define it, or to use an anisotropic spacing. However a warning will be issued since this breaks IBSI compliance
-  These features are stored in a CSV file with *n_cases* rows and  *n_features* columns.
+   These features are stored in a CSV file as defined above.
 
 
-### Applications and Limitations
-#### Pre-requisite
+### Pre-requisite
 
 A pre-requisite to Organ-omics is a specific dataset format:
 
@@ -92,9 +102,13 @@ A pre-requisite to Organ-omics is a specific dataset format:
 
 ```
 
+### Limitations
+
 To get the most from Organ-omics, the Field Of View (FOV) during acquisition should be:
  - As broad as possible: to include the most organs
  - The same for all patients: if an organ is cropped in a patient's scan, the radiomic features might be incorrect (e.g.: Volume, Sphericity, Maximum). If an organ is completely out of FOV, missing values will be introduced, which will impact the performance of downstream tasks.
+
+### Applications
 
 Organ-omics enables the exploration by clinicians and other researchersof the healthy organs' impact on patient survival and treatment response. It moves us one step closer to a completely automated analysis, from patient imaging to treatment personalization.
 
