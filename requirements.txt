@@ -1,10 +1,11 @@
-icare==0.1.0
 nibabel==5.2.1
 numpy==1.26.4
 pandas==2.2.2
 pyradiomics==3.0.1
 scikit-image==0.24.0
-scikit-learn==1.6.1
-scikit-survival==0.24.1
 SimpleITK==2.4.0
 tqdm==4.66.5
+
+#icare==0.1.0
+#scikit-learn==1.6.1
+#scikit-survival==0.24.1

@@ -1,6 +1,6 @@
 """Main radiomics extraction script"""
 
-if __name__ == "__main__":
+def main():
     import sys
     from argparse import ArgumentParser
     from utils.radiomics_extraction import extract_radiomics
@@ -12,6 +12,8 @@ if __name__ == "__main__":
     arg_parser.add_argument("--json-file-name", type=str, required=False, default="dataset.json")
 
     arguments = arg_parser.parse_args(sys.argv[1:])
-    print(arguments.d)
-    print(arguments.o)
     extract_radiomics(arguments.d, arguments.o, arguments.json_file_name)
+
+
+if __name__ == "__main__":
+    main()
