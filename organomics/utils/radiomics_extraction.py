@@ -39,7 +39,7 @@ def extract_radiomics(root_dataset_path, output_filename, json_file_name):
         root_dataset_path (str): path to the root of the nnUNet dataset
         output_directory (str): Output directory where the Organomics.csv file will be saved
     """
-    _, _, names, channels, _, _, classes, spacing = load_cases(root_dataset_path, json_file_name=json_file_name)
+    _, _, names, channels, _, _, classes, spacing = load_cases(root_dataset_path, json_filepath=json_file_name)
     display_radiomics_config(names, channels, classes, spacing)
     del classes["background"]  # Remove the background from channels
 
