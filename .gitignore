@@ -2,3 +2,5 @@ __pycache__/
 output.prof
 *.pyc
 build/
+dist/
+organomics/organomics.egg-info/
