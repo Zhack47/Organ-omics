@@ -7,14 +7,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sksurv.util import Surv
 from sksurv.metrics import concordance_index_censored, cumulative_dynamic_auc
-from scipy.stats import spearmanr, pearsonr
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest
 from sksurv.svm import FastSurvivalSVM
 from sksurv.linear_model import CoxnetSurvivalAnalysis
 from icare.survival import BaggedIcareSurvival
-from icare.visualisation import plot_avg_sign
 
 
 warnings.filterwarnings("ignore")
@@ -26,65 +24,57 @@ endpoints_clinical["Tobacco Consumption"] = [1 if x == 1. else -1 if x ==0. else
 endpoints_clinical["Alcohol Consumption"] = [1 if x == 1. else -1 if x ==0. else 0 for x in endpoints_clinical["Alcohol Consumption"]]
 endpoints_clinical["Performance Status"] = [-1 if np.isnan(x) else x for x in endpoints_clinical["Performance Status"]]
 endpoints_clinical["M-stage"] = [-1 if np.isnan(x) else 0 if x=='M0' else  1 if x=='Mx' else 2  for x in endpoints_clinical["Performance Status"]]
-#print(organomics.shape)
-df_train = pd.merge(organomics, endpoints_clinical, left_index=True, right_index=True)
-#df_train = endpoints_clinical
-print(df_train.shape)
-#####
 
-features = list(set(df_train.columns.tolist()) - set(['Relapse', 'RFS', 'Task 1', 'Task 2', 'CenterID']))
-#features = [x for x in features if 'lesions_merged' not in x and 'lymphnodes_merged' not in x]
-extra_features = ['Gender',
-                  'Age',
-                  'Tobacco Consumption',
-                  'Alcohol Consumption',
-                  'Performance status',
-                  'Treatment',
-                  'M-stage',
-                  #'nb_lesions',
-                  #'nb_lymphnodes',
-                  #'whole_body_scan'
-                  ]
-
-
-features_groups = list(map(str, np.unique(["_".join(x.split('_')[:-2]) for x in features])))
-features_groups = list(set(features_groups) - set(extra_features))
-# features_groups = [x + '_' for x in features_groups]
-features_groups.append('extra_features')
-print(len(features_groups), features_groups)
+df_train = organomics
+# df_train = radiomics
+# df_train = endpoints_clinical
+df_train = pd.merge(df_train, endpoints_clinical, left_index=True, right_index=True)
 
 ####
 
 y_train = Surv.from_arrays(event=df_train['Relapse'].values,
                            time=df_train['RFS'].values)
-#X_train, X_test = df_train[features], df_test[features]
 kfold = StratifiedKFold(3, random_state=np.random.randint(0, 100000000), shuffle=True)
 
 
-####
-features_groups_id = []
-for f in df_train.columns:
-    if f in extra_features:
-        features_groups_id.append(features_groups.index('extra_features'))
-    else:
-        group = "_".join(f.split('_')[:-2])
-        features_groups_id.append(features_groups.index(group))
+def get_duplicates(dataframe):
+    columns_to_remove = []
+    list_columns = copy.deepcopy(dataframe.columns)
+    i = 1 
+    for column1 in list_columns:
+        for column2 in list_columns[i:]:
+            if dataframe[column1].equals(dataframe[column2]):
+                columns_to_remove.append(column1)
+                break
+        i+=1
+    return columns_to_remove
 
+# Removing duplicate columns
+# duplicate_columns = get_duplicates(df_train)
+# for c in duplicate_columns:
+#     if c not in ["RFS", "Relapse", "Patient ID"]:
+#         del df_train[c]
+# print(df_train.shape)
 
-censored = df_train["Relapse"]
-ids = df_train.index
-ci_avg_train = 0.
-ci_avg_test = 0.
-#df_train = df_train.fillna(0)
-df_train = df_train.dropna(axis=1)
-print(df_train.shape)
 
 # Remove some
-for col in df_train.columns:
-    if "CT_nasal" not in str(col) and col not in ["Relapse", "RFS"]:
-        del df_train[col]
-print(df_train.shape)
+#for col in df_train.columns:
+#    if "CT_nasal" not in str(col) and col not in ["Relapse", "RFS"]:
+#        del df_train[col]
+#print(df_train.shape)
 
+####
+
+
+#df_train = df_train.fillna(0)
+df_train = df_train.dropna(axis=1)
+
+ci_avg_test = 0.
+ci_avg_train = 0.
+cdauc_avg_test=0.
+cdauc_avg_train=0.
+ids = df_train.index
+censored = df_train["Relapse"]
 for tr_ids, ts_ids in kfold.split(ids, censored):
     print("###############################################")
     train_ids = ids[tr_ids]
@@ -132,10 +122,12 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
 
     selected_features = X_train_local.columns[selector.get_support()]
     f_scores = selector.scores_[selector.get_support()]
-    print(f"Selected Features: {selected_features}")
-    #print(f"F-Scores: {f_scores}")
     X_train_local = X_train_local[selected_features]
     X_test_local = X_test_local[selected_features]
+    
+    print(f"Selected Features: {selected_features}")
+    #print(f"F-Scores: {f_scores}")
+    
     
     scaler = StandardScaler()
     X_train_local_np = scaler.fit_transform(X_train_local)
@@ -144,16 +136,24 @@ for tr_ids, ts_ids in kfold.split(ids, censored):
     model.fit(X_train_local, Y_train_local) # , feature_groups=features_groups_id)
     train_pred = model.predict(X_train_local)
     test_pred = model.predict(X_test_local)
-    #print(train_pred)
-    #test_pred = model.predict(X_test)
 
     ci_train = concordance_index_censored(Y_train_local["event"], Y_train_local["time"], train_pred)
     ci_test = concordance_index_censored(Y_test_local["event"], Y_test_local["time"], test_pred)
     ci_avg_train+=ci_train[0]
     ci_avg_test+=ci_test[0]
     print(ci_train[0], ci_test[0])
-    #spearmanr(train_pred, Y_train_local["time"])
-    #plot_avg_sign(model, features=extra_features)
-    #plt.show()
+    
+    time_points_train = np.arange(Y_train_local["time"][np.argpartition(Y_train_local["time"],5)[5]],
+                                                    Y_train_local["time"][np.argpartition(Y_train_local["time"],-5)[-5]], 50)
+    time_points_test = np.arange(Y_test_local["time"][np.argpartition(Y_test_local["time"],5)[5]],
+                                                    Y_test_local["time"][np.argpartition(Y_test_local["time"],-5)[-5]], 50)
+    cdauc_train = cumulative_dynamic_auc(Y_train_local, Y_train_local, train_pred, times=time_points_train)[1]
+    cdauc_test = cumulative_dynamic_auc(Y_train_local, Y_test_local, test_pred, times=time_points_test)[1]
+    cdauc_avg_train+=cdauc_train
+    cdauc_avg_test+=cdauc_test
+    print(cdauc_train, cdauc_test)
+
 print(f"Average train CI:{ci_avg_train/3}")
 print(f"Average test CI:{ci_avg_test/3}")
+print(f"Average train cdAUC:{cdauc_avg_train/5}")
+print(f"Average test cdAUC:{cdauc_avg_test/5}")
