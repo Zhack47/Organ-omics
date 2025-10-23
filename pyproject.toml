@@ -14,7 +14,7 @@ authors = [
 ]
 readme = "README.md"
 [project.scripts]
-Organomics_contour_dataset = "contour_dataset:main"
-Organomics_extract_radiomics = "extract_radiomics:main"
+organomics_contour_dataset = "contour_dataset:main"
+organomics_extract_radiomics = "extract_radiomics:main"
 [tool.setuptools.package-dir]
 '' = "organomics"

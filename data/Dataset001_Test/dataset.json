@@ -19,7 +19,7 @@
     "tasks":[
          {
             "name": "total",
-            "correspondance":
+            "correspondence":
                 {
                     "heart": ["heart"],
                     "lungs": ["lung_upper_lobe_left", "lung_lower_lobe_left", "lung_upper_lobe_right",
@@ -31,7 +31,7 @@
             },
             {
                 "name": "abdominal_muscles",
-                "correspondance":{
+                "correspondence":{
                     "pectoralis": ["pectoralis_major_right", "pectoralis_major_left"],
                     "rectus": ["rectus_abdominis_right", "rectus_abdominis_left"]
                 }

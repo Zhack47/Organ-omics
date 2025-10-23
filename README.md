@@ -1,10 +1,10 @@
 # Organ-omics
 
-## Organ radiomics extraction in python
+## Organ radiomics extraction using Python
 
 This repository features the code needed to perform:
 - **Automated organ segmentation** (using [TotalSegmentator](https://github.com/wasserth/TotalSegmentator))
--  **Organ radiomic** (and other radiomic) features extraction (using [pyRadiomics](https://github.com/AIM-Harvard/pyradiomics/))
+-  **Organ radiomic** (and other radiomic) features extraction (using [PyRadiomics](https://github.com/AIM-Harvard/pyradiomics/))
 
 
 ## Installation
@@ -13,7 +13,7 @@ We recommend installing PyRadiomics using the GitHub main branch since the PyPi 
 
 `pip install git+https://github.com/AIM-Harvard/pyradiomics.git`
 
-Then Organ-omics can be installed from PyPiTest
+Organ-omics is currently available via Test PyPI
 
 `pip install -i https://test.pypi.org/simple/ organomics`
 
@@ -35,11 +35,11 @@ dataset_path
       ├── 
 ```
 
-The `labelsTs` folder can be empty as it will be used to store organ contours once they are extracted.aIf you want to extract radiomic features of an already contoured lesion class, labelsTs can contain the lesions contours for each patient.
+The `labelsTr` folder can be empty as it will be used to store organ contours once they are extracted. If you want to extract radiomic features of an already contoured lesion class, labelsTr can contain the lesions contours for each patient.
 
  
 
-The file ```dataset.json``` should be constructed as shown in [this example](https://raw.githubusercontent.com/Zhack47/Organ-omics/refs/heads/main/data/Dataset001_Test/dataset.json)
+The file `dataset.json` should be constructed as shown in [this example](https://raw.githubusercontent.com/Zhack47/Organ-omics/refs/heads/main/data/Dataset001_Test/dataset.json)
 
 ```json
 
@@ -66,7 +66,7 @@ The file ```dataset.json``` should be constructed as shown in [this example](htt
     },
     // For each task, the name of the task is defined
     // then the mapping from task organs to organ groups
-    // is defined in correspondance
+    // is defined in correspondence
 
     // The priority order (i.e. which task will overwrite the labels 
     // the others) is defined by the position in the list
@@ -74,8 +74,8 @@ The file ```dataset.json``` should be constructed as shown in [this example](htt
          {// First task
             // Task name (must be from TotalSegmentator)
             "name": "total",
-            // Correspondance dictionnary
-            "correspondance":
+            // Correspondence dictionnary
+            "correspondence":
                 {
                     "heart": ["heart"],
                     "lungs": [
@@ -92,7 +92,7 @@ The file ```dataset.json``` should be constructed as shown in [this example](htt
             },
             {// Second task
                 "name": "abdominal_muscles", 
-                "correspondance":{
+                "correspondence":{
                     "pectoralis": [
                      "pectoralis_major_right", "pectoralis_major_left"
                      ],
@@ -109,11 +109,11 @@ The file ```dataset.json``` should be constructed as shown in [this example](htt
 
 **Multiple tasks from TotalSegmentator can be combined** to create custom organ sets.
 
-Some tasks can only be used with a license issued by the team maintaining TotalSegmentator. **No license can be obtained through Organ-omics**
+⚠️ Some tasks can only be used with a license issued by the team maintaining TotalSegmentator. **No license can be obtained through Organ-omics**
 
 ## Organs contours extraction
 
-Using the following command in the root folder, organs contours will be saved in compressed NifTi (.nii.gz) files  in the `<contours_output_path>/labelsTr` folder.
+Using the following command in the root folder, organs contours will be saved in compressed NIfTi (.nii.gz) files  in the `<contours_output_path>/labelsTr` folder.
 
 ```Organomics_contour_dataset -d <dataset_path> -o <contours_output_path>```
 
@@ -123,18 +123,26 @@ Once the organ contours have been extracted and stored in the `labelsTr` folder 
 
 ``` Organomics_extract_radiomics -d <dataset_path> -o <csv_file_organomics_output_path>```
 
-Radiomic features values will be stored in the file defined with the `-o` option.
+Radiomic feature values will be stored in the file defined with the `-o` option.
 
 
 
 [//]: <> (## Results on the HECKTOR22 dataset)
 
-[//]: <> (![Performance using Organomics for survival estimation]data/imgs/Organomics_performance.png)
-[//]: <> (Performance obtained using Organomics for survival estimation)
+[//]: <> (![Performance using Organ-omics for survival estimation]data/imgs/Organomics_performance.png)
+[//]: <> (Performance obtained using Organ-omics for survival estimation)
 
 [//]: <> (![Performance using Radiomics for survival estimation]data/imgs/Radiomics_performance.png)
 Performance obtained using Radiomics for survival estimation)
 
+
+# Citation
+
+If you use Organ-omics in your research, please cite:
+
+```
+Zacharia Mesbah (2025). Organ-omics: A Python package for organ-radiomics extraction.
+```
 
 # References
 
