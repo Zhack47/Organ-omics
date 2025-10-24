@@ -24,7 +24,7 @@ def load_cases(root_path, json_filepath):
         classes: list of classes (organ groups names)
         spacing: User defined common isotropic spacing. Can be None if not specified in the configuration file
     """
-    with open(join(root_path, json_filepath), "rb") as json_file:
+    with open(json_filepath, "rb") as json_file:
         dataset_json = json.load(json_file)
     # Get spacing for resampling
     try:
@@ -116,7 +116,3 @@ def display_radiomics_config(names, channels, classes, spacing):
     else:
         res+=f"Volumes will be resampled to a {spacing} spacing.\n"
     print(res)
-
-
-if __name__ == "__main__":
-    images_, labels_, names_, channels_, nb_channels_, channel_ct_, classes_, spacing_ = load_cases("../data/Dataset001_Test")
