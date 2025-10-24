@@ -30,13 +30,11 @@ def load_cases(root_path, json_filepath):
     try:
         spacing = dataset_json["spacing"]
         if len(spacing) != 3:
-            spacing = None
             raise ValueError("Wrong spacing format!")
         if len(set(spacing))!=1:
+            print("reached aniso")
             warnings.warn("Anisotropic spacing detected! This breaks the IBSI standard.")
-    except (KeyError, ValueError) as e:  # This part is ugly, but who knows wht error can be triggered through user input...
-        if isinstance(e, ValueError) and str(e) != "Wrong spacing format!":
-            raise e
+    except KeyError:
         spacing = None
         warnings.warn("No common isotropic spacing was defined! This breaks the IBSI standard.")
 
