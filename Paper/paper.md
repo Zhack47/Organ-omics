@@ -26,35 +26,32 @@ bibliography: paper.bib
 ---
 # Summary
 
-To support personalized medicine, we present Organ-omics, an automated organ-radiomics extraction pipeline developed to be used with Python. Building on top of PyRadiomics [@van2017computational] for radiomics extraction and TotalSegmentator [@wasserthal2023totalsegmentator] for automatic organ contouring, this tool extends the path to precision medicine.
-Starting from a NifTi formatted dataset and a configuration file (JSON format), this tool allows a user to define a set of organs to be contoured using TotalSegmentator (TS). Using the config file, the user can define organ groups, which can include multiple organs available in TS. All freely available TS tasks can be used and combined to create unique sets of organs. Some TS tasks require a license (see [here](https://backend.totalsegmentator.com/license-academic/)) which must be set up after TS is installed.
-A spacing can also be defined in the config file, which will be used to resample images and masks before the features are computed.
+To support personalized medicine, we present Organ-omics, an automated organ-radiomics extraction pipeline developed to be used with Python. Building on top of PyRadiomics [@van2017computational] for radiomics extraction and TotalSegmentator [@wasserthal2023totalsegmentator] for automatic organ contouring, this tool helps paving the way towards precision medicine.
+
+Starting from a NifTi formatted dataset and a configuration file (JSON format), this tool allows a user to define a set of organs to be contoured using TotalSegmentator (TS). Using this config file, the user can define organ groups, which include one or multiple organs available in TS. All freely available TS tasks can be used and combined to create unique sets of organs. Some TS tasks require a license (see [here](https://backend.totalsegmentator.com/license-academic/)) which must be set up after TS is installed.
+
+Once the organ contours are extracted, the second part of the pipeline automatically computes radiomic features for the contoured ROI and saves them in a CSV file. By automating the organ-radiomics extraction process this tool allows researchers to focus on the downstream task (patient classification, survival prediction, treatment response prediction...)
 
 
 # Statement of need
 
-Radiomics derived from lesions are widely used in medical imaging studies, but lesion-based approaches have limitations: contouring is uncertain, not reproducible [@podobnik2024voariability] and a limited amount of information is provided using this method.
+Radiomics derived from lesions or other human made contours are widely used in medical imaging studies, but these approaches have limitations: human contouring is uncertain, not reproducible [@podobnik2024voariability] and a limited amount of information is provided when considering only the lesion.
 
 Prior work [@salimi2024organomics] has shown that surrounding tissue and organs carry a signal that is important for patient prognosis and that including organ-based radiomic features can improve the predictive performance of ML algorithms for outcomes such as Overall Survival (OS). To name these organ-based radiomics they used the name organomics.
 
 To our knowledge, there is no freely available end-to-end pipeline that automates organ-based radiomics extraction from medical imaging datasets. Organ-omics fills this gap by providing an automated and configurable Python pipeline which (1) generates organ contours using TS (2) groups organs according to a user-defined configuration and (3) extracts reproducible organ-level radiomic features using PyRadiomics.
 
-Organ-omics is intended to accelerate research on organ-based radiomics and to improve reproducibility across studies.
+Organ-omics is intended to accelerate research on organ-based radiomics and to improve reproducibility across studies by using deep-learning segmentation models.
 
 # Overview of Organ-omics
-Organ-omics is a command line Python package which extracts a CSV table of organ-level radiomic features. A user provides a JSON configuration file (see below) that specifies which segmentation tasks from TS should be used and how labels should be grouped to form the final labels: organ groups. 
+Organ-omics is a command line Python package which extracts and stores organ-level radiomic features in a CSV file. A user provides a JSON configuration file (see below) that specifies which segmentation tasks from TS should be used and how TS's labels should be grouped to form the final labels: organ groups. 
 
-The pipeline then runs TS efficiently by limiting the organs to the necessary minimum (through roi_subset, when available) and assembles labels according to the configuration.
+The first part of the pipeline then runs TS efficiently by limiting the organs to the necessary minimum (through roi_subset, when available) and assembles labels according to the configuration.
 
-**Command:** `organomics_contour_dataset -d [path_to_dataset] -o [path_to_labels_output] --json-file [path_to_JSON_file]`
+The second part automatically computes the 107 organ-level radiomic features available in PyRadiomics for each organ group and stores them in a single CSV file.
 
-A second step computes the 107 organ-level radiomic features for each organ group using PyRadiomics and stores them in a single CSV file.
+This radiomics extraction can be configured to resample the data to a common isotropic spacing beforehand, to comply with the IBSI standard [@hatt2018ibsi].
 
-This radiomics extraction can be configured to resample the data to a common isotropic spacing to comply with the IBSI standard [@hatt2018ibsi].
-
-
-
-**Command:** `organomics_extract_organomics -d [path_to_dataset] -o [path_to_csv_output] --json-file [path_to_JSON_file]`
 
 Organ-omics uses NIfTi at every step and can be integrated into larger preprocessing workflows or used as a standalone tool for organ radiomics studies.
 

@@ -10,10 +10,10 @@ def main():
     arg_parser = ArgumentParser()
     arg_parser.add_argument("-d", type=str, required=True)
     arg_parser.add_argument("-o", type=str, required=True)
-    arg_parser.add_argument("--json-file-name", type=str, required=False, default="dataset.json")
+    arg_parser.add_argument("--json-file-path", type=str, required=True)
 
     arguments = arg_parser.parse_args(sys.argv[1:])
-    segment_dataset(arguments.d, arguments.o, arguments.json_file_name)
+    segment_dataset(arguments.d, arguments.o, arguments.json_file_path)
 
 
 if __name__ == "__main__":

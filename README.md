@@ -1,22 +1,30 @@
 # Organ-omics
 
 ## Organ radiomics extraction using Python
-
-This repository features the code needed to perform:
-- **Automated organ segmentation** (using [TotalSegmentator](https://github.com/wasserth/TotalSegmentator))
--  **Organ radiomic** (and other radiomic) features extraction (using [PyRadiomics](https://github.com/AIM-Harvard/pyradiomics/))
-
+Organ-omics is intended to accelerate research on organ-based radiomics and to improve reproducibility across such studies.
+Organ-omics lets you automatically create organ contours using [TotalSegmentator](https://github.com/wasserth/TotalSegmentator). It then extracts radiomic features using [PyRadiomics](https://github.com/AIM-Harvard/pyradiomics/) from these contours across a whole dataset. Its contouring pipeline allows you to create custom organ sets with no additional code through a JSON config file. Organ-omics can be used as an end-to-end pipeline and is modular, using NIfTi files each step of the way, allowing you to use either the organ contouring or the radiomic extraction part on their own.
 
 ## Installation
 
-We recommend installing PyRadiomics using the GitHub main branch since the PyPi distribution seems broken (see [this issue](https://github.com/AIM-Harvard/pyradiomics/issues/900))
+### Install PyRadiomis from GitHub
+
+We recommend installing PyRadiomics (required depndency) using the GitHub main branch since the PyPi distribution seems broken (see [this issue](https://github.com/AIM-Harvard/pyradiomics/issues/900))
 
 `pip install git+https://github.com/AIM-Harvard/pyradiomics.git`
 
-Organ-omics is currently available via Test PyPI
+### Organ-omics from Test PyPI
+
+⚠️ Organ-omics is currently available via Test PyPI
 
 `pip install -i https://test.pypi.org/simple/ organomics`
 
+You can also install it from source
+
+```
+git clone https://github.com/Zhack47/Organ-omics.git
+cd organomics
+pip install -e .
+```
 
 ## Data format
 
