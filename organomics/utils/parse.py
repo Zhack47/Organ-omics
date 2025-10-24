@@ -79,23 +79,23 @@ def config_total_seg(dastaset_json_path):
 
     tasknames = []
     organs_to_extract = {}
-    new_correspondance = {}
+    new_correspondence = {}
     tasks: list = json_object["tasks"]
     labels_dict = json_object["labels"]
     for task in tasks:
         organs_to_extract[task["name"]] = []
         task_name = task["name"]
-        new_correspondance[task_name] = {}
+        new_correspondence[task_name] = {}
         tasknames.append(task_name)
-        correspondance = task["correspondance"]
-        for group, labels_list in correspondance.items():
+        correspondence = task["correspondence"]
+        for group, labels_list in correspondence.items():
             if group in labels_dict.keys():
-                if group not in new_correspondance:
-                    new_correspondance[task_name][group] = []
+                if group not in new_correspondence:
+                    new_correspondence[task_name][group] = []
                 for single_label in labels_list:
-                    new_correspondance[task_name][group].append(single_label)
+                    new_correspondence[task_name][group].append(single_label)
                     organs_to_extract[task["name"]].append(single_label)
-    return organs_to_extract, labels_dict, new_correspondance
+    return organs_to_extract, labels_dict, new_correspondence
 
 
 def display_radiomics_config(names, channels, classes, spacing):
