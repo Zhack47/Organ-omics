@@ -152,6 +152,8 @@ If you use Organ-omics in your research, please cite:
 Zacharia Mesbah (2025). Organ-omics: A Python package for organ-radiomics extraction.
 ```
 
+A paper has been submitted for review
+
 # References
 
 Wasserthal, J., Breit, H.-C., Meyer, M.T., Pradella, M., Hinck, D., Sauter, A.W., Heye, T., Boll, D., Cyriac, J., Yang, S., Bach, M., Segeroth, M., 2023. TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images. Radiology: Artificial Intelligence. https://doi.org/10.1148/ryai.230024
