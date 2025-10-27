@@ -55,7 +55,7 @@ The first part of the pipeline then runs TS efficiently by limiting the organs t
 
 The second part automatically computes the 107 organ-level radiomic features available in PyRadiomics for each organ group and stores them in a single CSV file.
 
-This radiomics extraction can be configured to resample the data to a common isotropic spacing beforehand, to comply with the IBSI standard [@hatt2018ibsi].
+This radiomics extraction can be configured to resample the data to a common isotropic spacing beforehand, to comply with the IBSI standard [@doi:10.1148/radiol.2020191145].
 
 
 Organ-omics uses NIfTi at every step and can be integrated into larger preprocessing workflows or used as a standalone tool for organ radiomics studies.
