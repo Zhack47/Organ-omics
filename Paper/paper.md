@@ -9,15 +9,12 @@ tags:
 authors:
   - name: Zacharia Mesbah
     orcid: 0009-0008-4604-6852
-    equal-contrib: true
     affiliation: "1,2" # (Multiple affiliations must be quoted)
   - name: Romain Modzelewski
     orcid: 
-    equal-contrib: false
     affiliation: "1" # (Multiple affiliations must be quoted)
   - name: Sébastien Thureau
     orcid: 
-    equal-contrib: false
     affiliation: "1" # (Multiple affiliations must be quoted)
 affiliations:
  - name: AIMS-QuantIF, Rouen Normandy University, France
