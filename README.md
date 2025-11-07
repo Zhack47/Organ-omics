@@ -1,5 +1,7 @@
 # Organ-omics
 
+[![status](https://joss.theoj.org/papers/eb222a85f897be2ed91d86ca9b86d108/status.svg)](https://joss.theoj.org/papers/eb222a85f897be2ed91d86ca9b86d108)
+
 ## Organ radiomics extraction using Python
 Organ-omics is intended to accelerate research on organ-based radiomics and to improve reproducibility across such studies.
 Organ-omics lets you automatically create organ contours using [TotalSegmentator](https://github.com/wasserth/TotalSegmentator). It then extracts radiomic features using [PyRadiomics](https://github.com/AIM-Harvard/pyradiomics/) from these contours across a whole dataset. Its contouring pipeline allows you to create custom organ sets with no additional code through a JSON config file. Organ-omics can be used as an end-to-end pipeline and is modular, using NIfTi files each step of the way, allowing you to use either the organ contouring or the radiomic extraction part on their own.
