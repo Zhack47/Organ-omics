@@ -125,13 +125,13 @@ The file `dataset.json` should be constructed as shown in [this example](https:/
 
 Using the following command in the root folder, organs contours will be saved in compressed NIfTi (.nii.gz) files  in the `<contours_output_path>/labelsTr` folder.
 
-```Organomics_contour_dataset -d <dataset_path> -o <contours_output_path>```
+```Organomics_contour_dataset -d <dataset_path> -o <contours_output_path> --json-file-path <json_file_path>```
 
 ## Organ radiomics extraction
 
 Once the organ contours have been extracted and stored in the `labelsTr` folder of the dataset, use the following command to compute the organ radiomics.
 
-``` Organomics_extract_radiomics -d <dataset_path> -o <csv_file_organomics_output_path>```
+``` Organomics_extract_radiomics -d <dataset_path> -o <csv_file_organomics_output_path> --json-file-path <json_file_path>```
 
 Radiomic feature values will be stored in the file defined with the `-o` option.
 
