@@ -1,5 +1,7 @@
 # Organ-omics
 
+[![status](https://joss.theoj.org/papers/eb222a85f897be2ed91d86ca9b86d108/status.svg)](https://joss.theoj.org/papers/eb222a85f897be2ed91d86ca9b86d108)
+
 ## Organ radiomics extraction using Python
 Organ-omics is intended to accelerate research on organ-based radiomics and to improve reproducibility across such studies.
 Organ-omics lets you automatically create organ contours using [TotalSegmentator](https://github.com/wasserth/TotalSegmentator). It then extracts radiomic features using [PyRadiomics](https://github.com/AIM-Harvard/pyradiomics/) from these contours across a whole dataset. Its contouring pipeline allows you to create custom organ sets with no additional code through a JSON config file. Organ-omics can be used as an end-to-end pipeline and is modular, using NIfTi files each step of the way, allowing you to use either the organ contouring or the radiomic extraction part on their own.
@@ -123,13 +125,13 @@ The file `dataset.json` should be constructed as shown in [this example](https:/
 
 Using the following command in the root folder, organs contours will be saved in compressed NIfTi (.nii.gz) files  in the `<contours_output_path>/labelsTr` folder.
 
-```Organomics_contour_dataset -d <dataset_path> -o <contours_output_path>```
+```Organomics_contour_dataset -d <dataset_path> -o <contours_output_path> --json-file-path <json_file_path>```
 
 ## Organ radiomics extraction
 
 Once the organ contours have been extracted and stored in the `labelsTr` folder of the dataset, use the following command to compute the organ radiomics.
 
-``` Organomics_extract_radiomics -d <dataset_path> -o <csv_file_organomics_output_path>```
+``` Organomics_extract_radiomics -d <dataset_path> -o <csv_file_organomics_output_path> --json-file-path <json_file_path>```
 
 Radiomic feature values will be stored in the file defined with the `-o` option.
 
