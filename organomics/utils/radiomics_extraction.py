@@ -62,10 +62,12 @@ def extract_radiomics(root_dataset_path, output_filename, json_file_name):
         for modality_value, modality_name in channels.items():
             image_path = join(root_dataset_path, "imagesTr", f"{name}_{str(modality_value).zfill(4)}.nii.gz")
             image = load_image(image_path)
-            image = resample_image_to_spacing(image, spacing)
+            #image = resample_image_to_spacing(image, spacing)
             for class_name, mask in masks.items():
-                mask = resample_mask(mask, image)
+                #mask = resample_mask(mask, image)
                 cropped_image, cropped_mask = crop_image_mask(image, mask, margin=(2,2,2))
+                cropped_image = resample_image_to_spacing(cropped_image, spacing)
+                cropped_mask = resample_mask(cropped_mask, image)
                 re = Radiomics_Extractor(cropped_image, cropped_mask)
                 feature_vector = re.get_feature_vector()
                 for key, _ in feature_vector.items():
